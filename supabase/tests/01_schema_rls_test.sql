@@ -2,7 +2,7 @@
 begin;
 create extension if not exists pgtap with schema extensions;
 
-select plan(39);
+select plan(44);
 
 -- Tables E1.
 select has_table('public', 'profiles', 'table profiles');
@@ -56,6 +56,13 @@ select has_domain('public', 'duree_seance', 'domaine duree_seance (liste fermée
 select has_function('public', 'current_user_role', 'fonction current_user_role()');
 select has_function('public', 'my_coach_id', 'fonction my_coach_id()');
 select has_function('public', 'is_coach_of', array['uuid'], 'fonction is_coach_of(uuid)');
+
+-- Vue my_coach (ADR-024) : 3 colonnes seulement, jamais l'e-mail.
+select has_view('public', 'my_coach', 'vue my_coach (ADR-024)');
+select has_column('public', 'my_coach', 'id', 'my_coach expose id');
+select has_column('public', 'my_coach', 'prenom', 'my_coach expose prenom');
+select has_column('public', 'my_coach', 'nom', 'my_coach expose nom');
+select hasnt_column('public', 'my_coach', 'email', 'my_coach n''expose pas l''e-mail (ADR-024)');
 
 select * from finish();
 rollback;

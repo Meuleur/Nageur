@@ -7,7 +7,7 @@
 begin;
 create extension if not exists pgtap with schema extensions;
 
-select plan(50);
+select plan(57);
 
 -- Simulation d'une session Supabase authentifiée (jeton JWT → auth.uid()).
 create function pg_temp.connecter(p_user_id uuid) returns void
@@ -32,8 +32,19 @@ $$;
 -- ---------------------------------------------------------------------------
 select pg_temp.connecter('30000000-0000-4000-8000-000000000001');
 
-select results_eq('select count(*)::int from public.profiles', array[2],
-  'nageur : voit son profil et celui de son coach uniquement');
+select results_eq('select count(*)::int from public.profiles', array[1],
+  'nageur : ne voit que son propre profil dans profiles (ADR-024)');
+select results_eq($$select count(*)::int from public.profiles where id = '20000000-0000-4000-8000-000000000001'$$, array[0],
+  'nageur : la ligne profil de son coach est inaccessible (ADR-024)');
+select results_eq($$select count(*)::int from public.profiles where email = 'camille.coach@nageur.test'$$, array[0],
+  'nageur : l''e-mail de son coach est inaccessible via profiles (ADR-024)');
+select results_eq($$select prenom || ' ' || nom from public.my_coach$$, array['Camille Durand'],
+  'nageur : obtient prénom + nom de son coach via la vue my_coach (ADR-024)');
+select throws_ok('select email from public.my_coach', '42703', null,
+  'nageur : la vue my_coach n''expose pas de colonne e-mail (ADR-024)');
+select throws_ok(
+  $$update public.my_coach set prenom = 'Hack'$$,
+  '42501', null, 'nageur : aucune écriture possible à travers la vue my_coach');
 select results_eq($$select count(*)::int from public.profiles where id = '30000000-0000-4000-8000-000000000002'$$, array[0],
   'nageur : ne voit pas le profil d''un autre nageur');
 select results_eq('select count(*)::int from public.seances', array[2],
@@ -91,6 +102,8 @@ select pg_temp.connecter('30000000-0000-4000-8000-000000000004');
 
 select results_eq('select count(*)::int from public.profiles', array[1],
   'nageur sans coach : ne voit que son propre profil');
+select results_eq('select count(*)::int from public.my_coach', array[0],
+  'nageur sans coach : la vue my_coach est vide (RG-13)');
 select results_eq('select count(*)::int from public.seances', array[0],
   'nageur sans coach : aucune séance visible');
 
@@ -204,6 +217,8 @@ select pg_temp.connecter_anon();
 
 select results_eq('select count(*)::int from public.profiles', array[0],
   'anon : aucune ligne visible');
+select throws_ok('select count(*) from public.my_coach', '42501', null,
+  'anon : la vue my_coach est inaccessible');
 select throws_ok(
   $$insert into public.profiles (id, role, prenom, nom, email)
     values (gen_random_uuid(), 'nageur', 'X', 'Y', 'x@y.test')$$,

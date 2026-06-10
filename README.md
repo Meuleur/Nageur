@@ -80,7 +80,8 @@ supabase/
   tests/                # tests pgTAP : schéma, contraintes métier, isolation RLS, cascades
 ```
 
-Principes (E1) : RLS activée sur **toutes** les tables ; un nageur n'accède qu'à ses données,
+Principes (E1) : RLS activée sur **toutes** les tables ; un nageur n'accède qu'à ses données
+(et au prénom/nom de son coach via la vue dédiée `my_coach` — jamais son e-mail, ADR-024) ;
 un coach qu'à ses nageurs affectés ; le super admin gère identités/rôles/affectations mais
 n'accède **pas** au contenu (séances, profils sportifs, auto-évaluations) ; `otp_codes`,
 `llm_providers` et `audit_log` sont réservés au serveur (aucune policy + privilèges révoqués).

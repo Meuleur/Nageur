@@ -77,7 +77,9 @@ alter table public.audit_log enable row level security;
 
 -- ---------------------------------------------------------------------------
 -- profiles
---   Nageur : lit/écrit son profil ; lit le profil de son coach.
+--   Nageur : lit/écrit son profil ; voit prénom + nom de son coach via la vue
+--            dédiée my_coach uniquement (pas d'accès direct à la ligne du
+--            coach, e-mail non exposé — ADR-024).
 --   Coach  : lit son profil ; lit les profils de ses nageurs affectés.
 --   Admin  : lit tout (identités + rôles + affectations) ; écrit affectations
 --            et rôles (champs protégés par trigger, cf. migration tables).
@@ -89,10 +91,8 @@ create policy profiles_select_son_profil
   on public.profiles for select to authenticated
   using (id = (select auth.uid()));
 
+-- ADR-024 : remplacée par la vue my_coach — on s'assure qu'elle n'existe plus.
 drop policy if exists profiles_select_nageur_lit_son_coach on public.profiles;
-create policy profiles_select_nageur_lit_son_coach
-  on public.profiles for select to authenticated
-  using (id = (select public.my_coach_id()));
 
 drop policy if exists profiles_select_coach_lit_ses_nageurs on public.profiles;
 create policy profiles_select_coach_lit_ses_nageurs
@@ -115,6 +115,27 @@ create policy profiles_update_admin
   on public.profiles for update to authenticated
   using ((select public.current_user_role()) = 'super_admin')
   with check ((select public.current_user_role()) = 'super_admin');
+
+-- ---------------------------------------------------------------------------
+-- Vue my_coach (ADR-024) — minimisation du profil coach exposé au nageur.
+-- Le nageur n'obtient que id, prenom, nom de SON coach. Vue volontairement
+-- non security_invoker : elle s'exécute avec les droits de son propriétaire
+-- (postgres) et contourne donc la RLS de profiles de façon contrôlée — elle
+-- ne renvoie au plus qu'une ligne (le coach de l'appelant) et 3 colonnes,
+-- jamais l'e-mail.
+-- ---------------------------------------------------------------------------
+create or replace view public.my_coach as
+  select p.id, p.prenom, p.nom
+  from public.profiles p
+  where p.id = public.my_coach_id();
+
+alter view public.my_coach set (security_invoker = false);
+
+-- La vue est techniquement auto-updatable et s'exécute en tant que postgres :
+-- on révoque TOUT (y compris les privilèges par défaut de authenticated) puis
+-- on ne rend que SELECT — aucune écriture possible à travers la vue.
+revoke all on public.my_coach from public, anon, authenticated;
+grant select on public.my_coach to authenticated;
 
 -- ---------------------------------------------------------------------------
 -- swimmer_profiles
