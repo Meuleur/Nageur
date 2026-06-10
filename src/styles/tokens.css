@@ -1,0 +1,41 @@
+/*
+ * Design tokens — B4 design system (App Natation).
+ * Single source of truth for colors, session status colors, radii and spacing.
+ * The shadcn/ui semantic variables (globals.css) are mapped onto these tokens.
+ * Dark mode is out of scope for v1 (B4); the CSS variable architecture keeps it possible later.
+ */
+:root {
+  /* Base palette (B4) */
+  --bg: #f7f9fb;
+  --surface: #ffffff;
+  --text: #0f172a;
+  --text-muted: #64748b;
+  --border: #e2e8f0;
+
+  /* Accent (B4) */
+  --primary: #0ea5e9;
+  --primary-hover: #0284c7;
+  --primary-soft: #e0f2fe;
+
+  /* Session status colors (B4 base + B3 soft/text declensions for AA contrast) */
+  --status-pending: #f59e0b;
+  --status-pending-soft: #fef3e2;
+  --status-pending-text: #92590b;
+  --status-valid: #10b981;
+  --status-valid-soft: #e6f8f1;
+  --status-valid-text: #0a7150;
+  --status-modified: #0ea5e9;
+  --status-modified-soft: #e0f2fe;
+  --status-modified-text: #0a6a91;
+  --status-refused: #ef4444;
+  --status-refused-soft: #fdecec;
+  --status-refused-text: #a52121;
+
+  /* Radii (B4: sm 8px / md 12px / lg 16px — cards use lg) */
+  --radius-sm: 0.5rem;
+  --radius-md: 0.75rem;
+  --radius-lg: 1rem;
+  --radius-xl: 1.25rem;
+
+  /* Spacing: the B4 4px scale matches Tailwind's default --spacing (0.25rem). */
+}
