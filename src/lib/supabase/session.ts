@@ -13,6 +13,11 @@ import { cookies } from "next/headers";
  * pose de cookies de session.
  */
 export async function createSessionClient() {
+  // `cookies()` d'abord : au build (prerender), cet appel fait basculer la
+  // page en rendu dynamique AVANT toute lecture d'environnement — le build
+  // doit réussir sans variables renseignées (D3), la CI n'en a aucune.
+  const cookieStore = await cookies();
+
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
@@ -21,8 +26,6 @@ export async function createSessionClient() {
       "Missing NEXT_PUBLIC_SUPABASE_URL or NEXT_PUBLIC_SUPABASE_ANON_KEY environment variable (see .env.example).",
     );
   }
-
-  const cookieStore = await cookies();
 
   return createServerClient(url, anonKey, {
     cookies: {
