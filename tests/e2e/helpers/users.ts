@@ -28,6 +28,32 @@ const LOCKOUT_USERS: Record<string, string> = {
   "mobile-chrome": "alex.coach@nageur.test",
 };
 
+type ProfilUser = { email: string; coach: string; coachEmail: string };
+
+/**
+ * CH3 — profil (E-11) : comptes AVEC coach, profil sportif vierge à chaque
+ * suite (purgé par global-setup). L'e-mail du coach sert à vérifier qu'il
+ * n'apparaît jamais côté nageur (ADR-024).
+ */
+const PROFIL_USERS: Record<string, ProfilUser> = {
+  chromium: {
+    email: "mia.nageur@nageur.test",
+    coach: "Camille Durand",
+    coachEmail: "camille.coach@nageur.test",
+  },
+  "mobile-chrome": {
+    email: "zoe.nageur@nageur.test",
+    coach: "Alex Martin",
+    coachEmail: "alex.coach@nageur.test",
+  },
+};
+
+/** CH3 — état sans coach (E-10, RG-13/RG-14). */
+const SANS_COACH_USERS: Record<string, string> = {
+  chromium: "tom.nageur@nageur.test",
+  "mobile-chrome": "theo.nageur@nageur.test",
+};
+
 function forProject<T>(map: Record<string, T>, testInfo: TestInfo): T {
   const value = map[testInfo.project.name];
   if (!value) {
@@ -39,3 +65,5 @@ function forProject<T>(map: Record<string, T>, testInfo: TestInfo): T {
 export const loginUserFor = (testInfo: TestInfo) => forProject(LOGIN_USERS, testInfo);
 export const resetUserFor = (testInfo: TestInfo) => forProject(RESET_USERS, testInfo);
 export const lockoutUserFor = (testInfo: TestInfo) => forProject(LOCKOUT_USERS, testInfo);
+export const profilUserFor = (testInfo: TestInfo) => forProject(PROFIL_USERS, testInfo);
+export const sansCoachUserFor = (testInfo: TestInfo) => forProject(SANS_COACH_USERS, testInfo);

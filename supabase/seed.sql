@@ -18,7 +18,13 @@ values
   ('00000000-0000-0000-0000-000000000000', '30000000-0000-4000-8000-000000000001', 'authenticated', 'authenticated', 'lea.nageur@nageur.test',    extensions.crypt('Password123!', extensions.gen_salt('bf')), now(), '{"provider":"email","providers":["email"]}', '{}', now(), now(), '', '', '', ''),
   ('00000000-0000-0000-0000-000000000000', '30000000-0000-4000-8000-000000000002', 'authenticated', 'authenticated', 'noah.nageur@nageur.test',   extensions.crypt('Password123!', extensions.gen_salt('bf')), now(), '{"provider":"email","providers":["email"]}', '{}', now(), now(), '', '', '', ''),
   ('00000000-0000-0000-0000-000000000000', '30000000-0000-4000-8000-000000000003', 'authenticated', 'authenticated', 'emma.nageur@nageur.test',   extensions.crypt('Password123!', extensions.gen_salt('bf')), now(), '{"provider":"email","providers":["email"]}', '{}', now(), now(), '', '', '', ''),
-  ('00000000-0000-0000-0000-000000000000', '30000000-0000-4000-8000-000000000004', 'authenticated', 'authenticated', 'lucas.nageur@nageur.test',  extensions.crypt('Password123!', extensions.gen_salt('bf')), now(), '{"provider":"email","providers":["email"]}', '{}', now(), now(), '', '', '', '')
+  ('00000000-0000-0000-0000-000000000000', '30000000-0000-4000-8000-000000000004', 'authenticated', 'authenticated', 'lucas.nageur@nageur.test',  extensions.crypt('Password123!', extensions.gen_salt('bf')), now(), '{"provider":"email","providers":["email"]}', '{}', now(), now(), '', '', '', ''),
+  -- Comptes E2E CH3 (profil) : un couple avec/sans coach PAR PROJET Playwright,
+  -- sans profil sportif seedé (le parcours E-11 le crée ; global-setup le purge).
+  ('00000000-0000-0000-0000-000000000000', '30000000-0000-4000-8000-000000000005', 'authenticated', 'authenticated', 'mia.nageur@nageur.test',    extensions.crypt('Password123!', extensions.gen_salt('bf')), now(), '{"provider":"email","providers":["email"]}', '{}', now(), now(), '', '', '', ''),
+  ('00000000-0000-0000-0000-000000000000', '30000000-0000-4000-8000-000000000006', 'authenticated', 'authenticated', 'tom.nageur@nageur.test',    extensions.crypt('Password123!', extensions.gen_salt('bf')), now(), '{"provider":"email","providers":["email"]}', '{}', now(), now(), '', '', '', ''),
+  ('00000000-0000-0000-0000-000000000000', '30000000-0000-4000-8000-000000000007', 'authenticated', 'authenticated', 'zoe.nageur@nageur.test',    extensions.crypt('Password123!', extensions.gen_salt('bf')), now(), '{"provider":"email","providers":["email"]}', '{}', now(), now(), '', '', '', ''),
+  ('00000000-0000-0000-0000-000000000000', '30000000-0000-4000-8000-000000000008', 'authenticated', 'authenticated', 'theo.nageur@nageur.test',   extensions.crypt('Password123!', extensions.gen_salt('bf')), now(), '{"provider":"email","providers":["email"]}', '{}', now(), now(), '', '', '', '')
 on conflict (id) do nothing;
 
 -- ---------------------------------------------------------------------------
@@ -35,7 +41,12 @@ insert into public.profiles (id, role, prenom, nom, email, coach_id) values
   ('30000000-0000-4000-8000-000000000001', 'nageur', 'Léa',   'Petit',   'lea.nageur@nageur.test',   '20000000-0000-4000-8000-000000000001'),
   ('30000000-0000-4000-8000-000000000002', 'nageur', 'Noah',  'Bernard', 'noah.nageur@nageur.test',  '20000000-0000-4000-8000-000000000001'),
   ('30000000-0000-4000-8000-000000000003', 'nageur', 'Emma',  'Roux',    'emma.nageur@nageur.test',  '20000000-0000-4000-8000-000000000002'),
-  ('30000000-0000-4000-8000-000000000004', 'nageur', 'Lucas', 'Moreau',  'lucas.nageur@nageur.test', null) -- nageur sans coach (RG-13)
+  ('30000000-0000-4000-8000-000000000004', 'nageur', 'Lucas', 'Moreau',  'lucas.nageur@nageur.test', null), -- nageur sans coach (RG-13)
+  -- Comptes E2E CH3 (profil) — pas de ligne swimmer_profiles seedée.
+  ('30000000-0000-4000-8000-000000000005', 'nageur', 'Mia',   'Lefevre',  'mia.nageur@nageur.test',  '20000000-0000-4000-8000-000000000001'),
+  ('30000000-0000-4000-8000-000000000006', 'nageur', 'Tom',   'Garcia',   'tom.nageur@nageur.test',   null), -- sans coach (RG-13)
+  ('30000000-0000-4000-8000-000000000007', 'nageur', 'Zoé',   'Lambert',  'zoe.nageur@nageur.test',  '20000000-0000-4000-8000-000000000002'),
+  ('30000000-0000-4000-8000-000000000008', 'nageur', 'Théo',  'Fontaine', 'theo.nageur@nageur.test',  null) -- sans coach (RG-13)
 on conflict (id) do nothing;
 
 -- ---------------------------------------------------------------------------
