@@ -15,7 +15,8 @@ import { decideRateLimit, type RateLimitDecision, type RateLimitPolicy } from ".
 export const RATE_LIMITS = {
   /** Échecs de connexion par compte : ~10 → verrou temporaire (ADR-018). */
   loginFailuresByEmail: { limit: 10, windowMs: 15 * 60_000, lockMs: 15 * 60_000 },
-  loginByIp: { limit: 30, windowMs: 15 * 60_000 },
+  /** Garde-fou grossier par IP — la mesure fine est le verrou par compte. */
+  loginByIp: { limit: 100, windowMs: 15 * 60_000 },
   signupByIp: { limit: 20, windowMs: 60 * 60_000 },
   /** Renvoi d'un code OTP : au plus un envoi par minute (ADR-018). */
   otpSendByUser: { limit: 1, windowMs: 60_000 },

@@ -1,13 +1,15 @@
 import { defineConfig, devices } from "@playwright/test";
 
 /**
- * Base Playwright configuration (CH0) — no scenario yet.
- * E2E scenarios for the critical flows (sign-up + 2FA, generation,
- * coach validation cycle) arrive with their respective chantiers (D2).
- * Run with `pnpm test:e2e` (requires `pnpm exec playwright install` once).
+ * Playwright configuration. The CH2 auth flows (sign-up + verification,
+ * login + 2FA gating, password reset, lockout) live in tests/e2e.
+ * Prerequisites: `pnpm supabase:start` (full local stack: GoTrue + Mailpit)
+ * and `pnpm exec playwright install` once. The dev server is started (or
+ * reused) automatically; e-mails are read from the local Mailpit inbox.
  */
 export default defineConfig({
   testDir: "tests/e2e",
+  globalSetup: "./tests/e2e/global-setup.ts",
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,

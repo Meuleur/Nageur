@@ -12,6 +12,8 @@
     "test:e2e": "playwright test",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
+    "supabase:start": "supabase start",
+    "supabase:stop": "supabase stop",
     "db:start": "supabase db start",
     "db:stop": "supabase stop",
     "db:reset": "supabase db reset --local",
