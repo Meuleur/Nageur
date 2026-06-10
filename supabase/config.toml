@@ -156,11 +156,14 @@ max_indexes = 5
 enabled = true
 # The base URL of your website. Used as an allow-list for redirects and for constructing URLs used
 # in emails.
-site_url = "http://127.0.0.1:3000"
+# CH2 : aligné sur l'origine utilisée par `pnpm dev` et Playwright — les liens
+# des e-mails ({{ .SiteURL }}/auth/confirm…) doivent rester sur la même origine
+# que la navigation pour que les cookies posés ensuite restent cohérents.
+site_url = "http://localhost:3000"
 # The public URL that Auth serves on. Defaults to the API external URL with `/auth/v1` appended.
 # external_url = ""
 # A list of *exact* URLs that auth providers are permitted to redirect to post authentication.
-additional_redirect_urls = ["https://127.0.0.1:3000"]
+additional_redirect_urls = ["http://localhost:3000", "https://127.0.0.1:3000"]
 # How long tokens are valid for, in seconds. Defaults to 3600 (1 hour), maximum 604,800 (1 week).
 jwt_expiry = 3600
 # JWT issuer URL. If not set, defaults to auth.external_url.
@@ -179,7 +182,11 @@ enable_anonymous_sign_ins = false
 # Allow/disallow testing manual linking of accounts
 enable_manual_linking = false
 # Passwords shorter than this value will be rejected as weak. Minimum 6, recommended 8 or more.
-minimum_password_length = 6
+# CH2/ADR-018 : ≥ 10 caractères. GoTrue est le filet de sécurité ; la règle
+# complète (3 catégories sur 4, mots de passe courants) est appliquée par les
+# schémas Zod côté client ET serveur (C1) — GoTrue ne sait pas exprimer
+# « 3 catégories sur 4 », on laisse donc password_requirements vide.
+minimum_password_length = 10
 # Passwords that do not meet the following requirements will be rejected as weak. Supported values
 # are: `letters_digits`, `lower_upper_letters_digits`, `lower_upper_letters_digits_symbols`
 password_requirements = ""
@@ -196,7 +203,10 @@ password_requirements = ""
 
 [auth.rate_limit]
 # Number of emails that can be sent per hour. Requires auth.email.smtp to be enabled.
-email_sent = 2
+# CH2 : sans SMTP custom ce plafond n'est pas appliqué en local (Mailpit) ;
+# relevé par confort pour les parcours E2E. En production (SMTP Resend),
+# ajuster dans le dashboard selon le trafic attendu.
+email_sent = 100
 # Number of SMS messages that can be sent per hour. Requires auth.sms to be enabled.
 sms_sent = 30
 # Number of anonymous sign-ins that can be made per hour per IP address. Requires enable_anonymous_sign_ins = true.
@@ -223,25 +233,47 @@ enable_signup = true
 # addresses. If disabled, only the new email is required to confirm.
 double_confirm_changes = true
 # If enabled, users need to confirm their email address before signing in.
-enable_confirmations = false
+# CH2/RG-05 : l'e-mail doit être vérifié avant toute connexion.
+enable_confirmations = true
 # If enabled, users will need to reauthenticate or have logged in recently to change their password.
 secure_password_change = false
 # Controls the minimum amount of time that must pass before sending another signup confirmation or password reset email.
-max_frequency = "1s"
+# CH2/ADR-018 : délai minimal entre deux envois — 60 s.
+max_frequency = "60s"
 # Number of characters used in the email OTP.
 otp_length = 6
 # Number of seconds before the email OTP expires (defaults to 1 hour).
-otp_expiry = 3600
+# CH2/ADR-018 : GoTrue n'a qu'UNE expiration pour tous les liens e-mail.
+# Réglée sur 24 h pour le lien de vérification d'inscription ; la fenêtre
+# d'1 h du lien de réinitialisation est imposée en plus côté serveur
+# (fonction public.recovery_token_issued_at, route /auth/confirm).
+otp_expiry = 86400
 
 # Use a production-ready SMTP server
+# CH2/ADR-013 : en production, Supabase Auth envoie via Resend (SMTP). En
+# local on garde Mailpit (capture des e-mails, aucun envoi réel) — ne pas
+# activer ce bloc en dev. Pour staging/production, reproduire ces réglages
+# dans le dashboard Supabase (ou via `supabase config push`) :
 # [auth.email.smtp]
 # enabled = true
-# host = "smtp.sendgrid.net"
-# port = 587
-# user = "apikey"
-# pass = "env(SENDGRID_API_KEY)"
-# admin_email = "admin@email.com"
-# sender_name = "Admin"
+# host = "smtp.resend.com"
+# port = 465
+# user = "resend"
+# pass = "env(RESEND_API_KEY)"
+# admin_email = "no-reply@<domaine-validé-resend>"
+# sender_name = "App Natation"
+
+# CH2 : gabarits d'e-mails en français (B4 — sobres, sans identité superflue).
+# Les liens pointent vers la route applicative /auth/confirm (token_hash) :
+# la vérification s'effectue côté serveur, sans session implicite (C1).
+# En production, recopier ces gabarits dans le dashboard Supabase.
+[auth.email.template.confirmation]
+subject = "Confirmez votre adresse e-mail"
+content_path = "./supabase/templates/confirmation.html"
+
+[auth.email.template.recovery]
+subject = "Réinitialisation de votre mot de passe"
+content_path = "./supabase/templates/recovery.html"
 
 # Uncomment to customize email template
 # [auth.email.template.invite]

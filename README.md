@@ -23,28 +23,35 @@ cp .env.example .env.local   # puis renseigner les valeurs (projet Supabase de d
 pnpm dev                     # http://localhost:3000
 ```
 
-La page d'accueil est une démonstration de la charte (B4) : palette, typographie Inter,
-boutons, badges de statut, cartes et micro-animations. Aucune logique métier (chantier CH0).
+Pour travailler sur l'authentification (et tout ce qui suit), la **pile Supabase locale
+complète** doit tourner (Auth, API, boîte e-mail Mailpit) : `pnpm supabase:start` puis
+`pnpm db:reset`. En local, `EMAIL_DRIVER=mailpit` route tous les e-mails (vérification,
+réinitialisation, codes 2FA) vers Mailpit — http://127.0.0.1:54324, aucun envoi réel.
 
 ## Scripts
 
-| Script              | Rôle                                     |
-| ------------------- | ---------------------------------------- |
-| `pnpm dev`          | serveur de développement                 |
-| `pnpm build`        | build de production                      |
-| `pnpm start`        | sert le build de production              |
-| `pnpm lint`         | ESLint                                   |
-| `pnpm typecheck`    | vérification TypeScript (`tsc --noEmit`) |
-| `pnpm test`         | tests unitaires (Vitest)                 |
-| `pnpm test:e2e`     | tests E2E (Playwright)¹                  |
-| `pnpm format`       | formatage Prettier (écriture)            |
-| `pnpm format:check` | vérification du formatage                |
-| `pnpm db:start`     | base Supabase locale (Docker)²           |
-| `pnpm db:reset`     | rejoue migrations + seed (base propre)   |
-| `pnpm db:test`      | tests SQL pgTAP (RLS, contraintes)       |
-| `pnpm db:stop`      | arrête les conteneurs Supabase locaux    |
+| Script                | Rôle                                                |
+| --------------------- | --------------------------------------------------- |
+| `pnpm dev`            | serveur de développement                            |
+| `pnpm build`          | build de production                                 |
+| `pnpm start`          | sert le build de production                         |
+| `pnpm lint`           | ESLint                                              |
+| `pnpm typecheck`      | vérification TypeScript (`tsc --noEmit`)            |
+| `pnpm test`           | tests unitaires (Vitest)                            |
+| `pnpm test:e2e`       | tests E2E (Playwright)¹                             |
+| `pnpm format`         | formatage Prettier (écriture)                       |
+| `pnpm format:check`   | vérification du formatage                           |
+| `pnpm supabase:start` | pile Supabase locale complète (Auth, API, Mailpit)² |
+| `pnpm supabase:stop`  | arrête les conteneurs Supabase locaux               |
+| `pnpm db:start`       | base Postgres locale seule (Docker)²                |
+| `pnpm db:reset`       | rejoue migrations + seed (base propre)              |
+| `pnpm db:test`        | tests SQL pgTAP (RLS, contraintes)                  |
+| `pnpm db:stop`        | arrête les conteneurs Supabase locaux               |
 
-¹ Nécessite une fois `pnpm exec playwright install`. Aucun scénario en CH0 (config de base).
+¹ Nécessite une fois `pnpm exec playwright install`, la pile complète (`pnpm supabase:start`)
+et un `.env.local` avec `EMAIL_DRIVER=mailpit`. Les suites remettent à zéro les compteurs de
+rate limiting au démarrage et lisent les e-mails dans Mailpit. Après une suite E2E, exécuter
+`pnpm db:reset` avant `pnpm db:test` (les tests pgTAP supposent le seed de référence).
 ² Nécessite Docker. Le premier démarrage télécharge les images Supabase.
 
 ## Structure (D2)
@@ -90,6 +97,37 @@ Les écritures sensibles (création de séance, transitions de statut) passent p
 Comptes du seed (mot de passe commun `Password123!`) : `admin@nageur.test`,
 `camille.coach@nageur.test`, `alex.coach@nageur.test`, et 4 nageurs
 (`lea.nageur`, `noah.nageur`, `emma.nageur`, `lucas.nageur` — ce dernier sans coach).
+
+## Authentification & comptes (CH2)
+
+Identité conforme à C1 / ADR-018 : inscription nageur avec **vérification d'e-mail**
+(lien 24 h, RG-05), connexion **e-mail + mot de passe puis code OTP à 6 chiffres envoyé
+par e-mail** (2FA sur mesure), réinitialisation de mot de passe (lien 1 h, réponse
+générique, sessions invalidées), politique de mot de passe (≥ 10 caractères, 3 catégories
+sur 4, rejet des mots de passe courants), rate limiting applicatif et verrouillage
+temporaire après ~10 échecs de connexion.
+
+**Gating du second facteur (exigence centrale C1)** — aucune session Supabase n'est
+exposée au navigateur tant que le code OTP n'est pas validé :
+
+1. `loginAction` vérifie le mot de passe **côté serveur** via un client sans persistance ;
+   la session technique est révoquée immédiatement (`admin.signOut`) — seul un **jeton de
+   transition signé** (cookie httpOnly `an-2fa-en-attente`, 10 min) revient au navigateur ;
+2. le code OTP (haché HMAC, 10 min, 5 tentatives, usage unique, renvoi 60 s) est envoyé
+   par notre serveur (`src/server/otp`, `src/server/email`) ;
+3. `verifyOtpAction` valide le code puis — **seulement là** — établit la session Supabase
+   (cookies via les helpers SSR) et redirige selon le rôle (nageur → `/accueil`,
+   coach → `/coach`, admin → `/admin`) ;
+4. `src/proxy.ts` (Next 16) protège les routes : session validée par `getUser()` + rôle lu
+   sous RLS ; vérifier un e-mail ou ouvrir un lien de reset n'authentifie jamais
+   (`/auth/confirm` consomme les jetons sans poser de cookie de session).
+
+Les e-mails de vérification/réinitialisation partent de **Supabase Auth** (gabarits
+français dans `supabase/templates/`, réglages ADR-018 dans `supabase/config.toml`) ; en
+production, configurer le **SMTP Resend** et recopier ces gabarits dans le dashboard
+Supabase (bloc commenté dans `config.toml`). Le code OTP part de notre serveur via
+**Resend** (`RESEND_API_KEY`, `EMAIL_FROM`) — ou Mailpit en local. `audit_log` trace les
+événements sensibles **sans aucune donnée personnelle ni secret**.
 
 ## Environnements & secrets (D3)
 
