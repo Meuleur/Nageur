@@ -12,8 +12,7 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   title: "App Natation",
-  description:
-    "Génération de séances de natation assistée par IA, validées par un coach.",
+  description: "Génération de séances de natation assistée par IA, validées par un coach.",
 };
 
 export default function RootLayout({

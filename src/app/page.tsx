@@ -84,18 +84,16 @@ export default function DesignSystemDemoPage() {
                 <Waves className="size-6" aria-hidden />
               </div>
               <div>
-                <h1 className="text-2xl font-semibold sm:text-[28px] sm:leading-9">
-                  App Natation
-                </h1>
+                <h1 className="text-2xl font-semibold sm:text-[28px] sm:leading-9">App Natation</h1>
                 <p className="text-caption text-muted-foreground">
                   Chantier CH0 — Fondations · Démonstration de la charte (B4)
                 </p>
               </div>
             </div>
             <p className="max-w-2xl text-[15px] text-muted-foreground">
-              Cette page valide l&apos;application du système de design&nbsp;:
-              palette, typographie Inter, badges de statut, boutons, cartes et
-              micro-animations. Elle ne contient aucune logique métier.
+              Cette page valide l&apos;application du système de design&nbsp;: palette, typographie
+              Inter, badges de statut, boutons, cartes et micro-animations. Elle ne contient aucune
+              logique métier.
             </p>
           </motion.header>
 
@@ -158,9 +156,7 @@ export default function DesignSystemDemoPage() {
                       </CardAction>
                     </CardHeader>
                     <CardContent>
-                      <p className="text-[15px] leading-relaxed text-muted-foreground">
-                        {body}
-                      </p>
+                      <p className="text-[15px] leading-relaxed text-muted-foreground">{body}</p>
                     </CardContent>
                     <CardFooter className="justify-end gap-2">
                       <Button variant="ghost" size="sm">
@@ -189,8 +185,8 @@ export default function DesignSystemDemoPage() {
                 </p>
                 <p className="text-lg font-semibold">Sous-titre — semibold 18</p>
                 <p className="text-base">
-                  Corps de texte — regular 16. La séance générée est relue puis
-                  validée par le coach avant d&apos;être visible par le nageur.
+                  Corps de texte — regular 16. La séance générée est relue puis validée par le coach
+                  avant d&apos;être visible par le nageur.
                 </p>
                 <p className="text-caption text-muted-foreground">
                   Légende / méta — regular 13, couleur atténuée.
@@ -201,8 +197,7 @@ export default function DesignSystemDemoPage() {
 
           <motion.footer variants={sectionVariants}>
             <p className="text-caption text-muted-foreground">
-              Page de démonstration de la charte — aucune logique métier
-              (chantier CH0).
+              Page de démonstration de la charte — aucune logique métier (chantier CH0).
             </p>
           </motion.footer>
         </motion.div>
