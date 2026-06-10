@@ -39,8 +39,13 @@ boutons, badges de statut, cartes et micro-animations. Aucune logique métier (c
 | `pnpm test:e2e`     | tests E2E (Playwright)¹                  |
 | `pnpm format`       | formatage Prettier (écriture)            |
 | `pnpm format:check` | vérification du formatage                |
+| `pnpm db:start`     | base Supabase locale (Docker)²           |
+| `pnpm db:reset`     | rejoue migrations + seed (base propre)   |
+| `pnpm db:test`      | tests SQL pgTAP (RLS, contraintes)       |
+| `pnpm db:stop`      | arrête les conteneurs Supabase locaux    |
 
 ¹ Nécessite une fois `pnpm exec playwright install`. Aucun scénario en CH0 (config de base).
+² Nécessite Docker. Le premier démarrage télécharge les images Supabase.
 
 ## Structure (D2)
 
@@ -60,6 +65,32 @@ Séparation stricte client/serveur : `src/lib/supabase/client.ts` (clé anon, so
 côté navigateur ; `src/lib/supabase/server.ts` (clé service role, protégée par `server-only`)
 réservé aux opérations privilégiées. Aucun secret côté client.
 
+## Base de données & RLS (CH1)
+
+Le schéma (E1) est géré **comme du code** via les migrations Supabase versionnées (D3) :
+
+```
+supabase/
+  config.toml           # config du projet local (Postgres 17)
+  migrations/           # migrations SQL idempotentes, ordonnées par horodatage
+    …_types_enums.sql                 # enums E1 + domaine duree_seance (liste fermée)
+    …_tables_contraintes_index.sql    # 9 tables, contraintes, cascades RG-41, triggers, index
+    …_rls_policies.sql                # fonctions d'autorisation + policies par table/opération
+  seed.sql              # jeu de données de test (dev/staging) — jamais en production
+  tests/                # tests pgTAP : schéma, contraintes métier, isolation RLS, cascades
+```
+
+Principes (E1) : RLS activée sur **toutes** les tables ; un nageur n'accède qu'à ses données
+(et au prénom/nom de son coach via la vue dédiée `my_coach` — jamais son e-mail, ADR-024) ;
+un coach qu'à ses nageurs affectés ; le super admin gère identités/rôles/affectations mais
+n'accède **pas** au contenu (séances, profils sportifs, auto-évaluations) ; `otp_codes`,
+`llm_providers` et `audit_log` sont réservés au serveur (aucune policy + privilèges révoqués).
+Les écritures sensibles (création de séance, transitions de statut) passent par le serveur.
+
+Comptes du seed (mot de passe commun `Password123!`) : `admin@nageur.test`,
+`camille.coach@nageur.test`, `alex.coach@nageur.test`, et 4 nageurs
+(`lea.nageur`, `noah.nageur`, `emma.nageur`, `lucas.nageur` — ce dernier sans coach).
+
 ## Environnements & secrets (D3)
 
 Trois environnements isolés : **dev** (local, `.env.local`), **staging** et **production**
@@ -77,8 +108,12 @@ valeurs ; `.gitignore` exclut tous les `.env*`.
 
 ## Intégration continue
 
-GitHub Actions (`.github/workflows/ci.yml`) : lint, typecheck, tests unitaires et build
-à chaque push et pull request.
+GitHub Actions (`.github/workflows/ci.yml`) à chaque push et pull request :
+
+- **quality** — lint, typecheck, tests unitaires, build ;
+- **database** — démarrage d'une base Supabase propre, application des migrations + seed,
+  rejeu des migrations (preuve d'idempotence) et tests pgTAP (isolation RLS, contraintes
+  métier, cascades).
 
 ## Workflow Git (F3)
 

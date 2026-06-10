@@ -39,3 +39,38 @@ jobs:
 
       - name: Build
         run: pnpm build
+
+  database:
+    name: Migrations, seed & tests RLS (pgTAP)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Start local database (applies migrations + seed on a clean env)
+        run: pnpm db:start
+
+      - name: Replay migrations (idempotence, D3)
+        run: |
+          for f in supabase/migrations/*.sql; do
+            echo "--- replay: $f"
+            docker exec -i supabase_db_appNageur psql -U postgres -d postgres -v ON_ERROR_STOP=1 -q < "$f"
+          done
+
+      - name: Replay seed (idempotence)
+        run: docker exec -i supabase_db_appNageur psql -U postgres -d postgres -v ON_ERROR_STOP=1 -q < supabase/seed.sql
+
+      - name: pgTAP tests (isolation RLS, contraintes métier, cascades)
+        run: pnpm db:test
