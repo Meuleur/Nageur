@@ -90,7 +90,11 @@ export async function verifyOtpCode(userId: string, code: string): Promise<OtpDe
     return { status: "expired" };
   }
 
-  const decision = decideOtpAttempt({ ...record, attempts: claimed.attempts }, candidateHash, Date.now());
+  const decision = decideOtpAttempt(
+    { ...record, attempts: claimed.attempts },
+    candidateHash,
+    Date.now(),
+  );
   if (decision.status !== "ok") {
     return decision;
   }

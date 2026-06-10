@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useEffect, useState } from "react";
+import { useActionState, useState, useSyncExternalStore } from "react";
 
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
@@ -20,18 +20,23 @@ function formatRemaining(ms: number): string {
 }
 
 /**
- * Horloge démarrée APRÈS montage (null au rendu serveur et au premier rendu
- * client) : le texte initial reste identique des deux côtés — pas de
- * désynchronisation d'hydratation pour un compte à rebours.
+ * Horloge à la seconde, exposée comme « store externe » : null au rendu
+ * serveur et pendant l'hydratation (textes initiaux identiques des deux
+ * côtés — pas de désynchronisation), puis la valeur réelle, re-rendue à
+ * chaque tick.
  */
+function subscribeToClock(onTick: () => void) {
+  const interval = window.setInterval(onTick, 1000);
+  return () => window.clearInterval(interval);
+}
+
 function useNow(): number | null {
-  const [now, setNow] = useState<number | null>(null);
-  useEffect(() => {
-    setNow(Date.now());
-    const interval = window.setInterval(() => setNow(Date.now()), 1000);
-    return () => window.clearInterval(interval);
-  }, []);
-  return now;
+  return useSyncExternalStore(
+    subscribeToClock,
+    // Arrondi à la seconde : l'instantané reste stable entre deux ticks.
+    () => Math.floor(Date.now() / 1000) * 1000,
+    () => null,
+  );
 }
 
 /**
@@ -49,16 +54,22 @@ export function OtpForm({ initialExpiresAt }: { initialExpiresAt: number }) {
   // Anti-spam de renvoi, côté affichage (le serveur fait foi).
   const [resendBlockedUntil, setResendBlockedUntil] = useState(() => Date.now() + 60_000);
 
-  useEffect(() => {
+  // Réaction au résultat d'un renvoi — ajustement d'état PENDANT le rendu
+  // (pattern React « adjusting state when props change », pas d'effet).
+  // L'instant courant vient de l'horloge `now` (stable par rendu) : un
+  // résultat d'action n'arrive qu'après hydratation, donc now est non nul.
+  const [handledResendState, setHandledResendState] = useState(resendState);
+  if (resendState !== handledResendState && now !== null) {
+    setHandledResendState(resendState);
     if (resendState.otpExpiresAt) {
       setExpiresAt(resendState.otpExpiresAt);
     }
     if (resendState.status === "success") {
-      setResendBlockedUntil(Date.now() + 60_000);
+      setResendBlockedUntil(now + 60_000);
     } else if (resendState.resendAvailableInSeconds) {
-      setResendBlockedUntil(Date.now() + resendState.resendAvailableInSeconds * 1000);
+      setResendBlockedUntil(now + resendState.resendAvailableInSeconds * 1000);
     }
-  }, [resendState]);
+  }
 
   const errors = { ...verifyState.fieldErrors, ...clientErrors };
   const remainingMs = now === null ? null : expiresAt - now;

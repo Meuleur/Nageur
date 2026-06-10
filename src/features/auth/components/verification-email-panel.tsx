@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useEffect, useState } from "react";
+import { useActionState, useSyncExternalStore } from "react";
 
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { resendVerificationAction } from "@/features/auth/actions";
@@ -11,25 +11,34 @@ import { FormField } from "./form-field";
 import { SubmitButton } from "./submit-button";
 import { useClientValidation } from "./use-client-validation";
 
+/** Sentinelle « rendu serveur / hydratation » de useStoredEmail. */
+const SSR = Symbol("ssr");
+
+/**
+ * Adresse déposée en sessionStorage par les formulaires E-01 — jamais dans
+ * l'URL (D3 : pas de donnée personnelle dans les journaux). Lue comme store
+ * externe : SSR-stable, puis valeur réelle après hydratation.
+ */
+function useStoredEmail(): string | null | typeof SSR {
+  return useSyncExternalStore<string | null | typeof SSR>(
+    () => () => {},
+    () => window.sessionStorage.getItem("verification-email-adresse"),
+    () => SSR,
+  );
+}
+
 /**
  * E-03 — Renvoi de l'e-mail de vérification (RG-05). L'adresse vient de
- * sessionStorage (déposée par les formulaires E-01) — jamais de l'URL (D3) ;
- * à défaut, un champ permet de la saisir.
+ * sessionStorage ; à défaut, un champ permet de la saisir.
  */
 export function VerificationEmailPanel() {
   const [state, formAction] = useActionState(resendVerificationAction, AUTH_FORM_IDLE);
   const { clientErrors, onSubmit } = useClientValidation(emailOnlySchema);
-  const [knownEmail, setKnownEmail] = useState<string | null>(null);
-  const [ready, setReady] = useState(false);
-
-  useEffect(() => {
-    setKnownEmail(window.sessionStorage.getItem("verification-email-adresse"));
-    setReady(true);
-  }, []);
+  const knownEmail = useStoredEmail();
 
   const errors = { ...state.fieldErrors, ...clientErrors };
 
-  if (!ready) {
+  if (knownEmail === SSR) {
     return null;
   }
 

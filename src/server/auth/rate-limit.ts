@@ -77,7 +77,9 @@ export async function consumeRateLimit(
     bucket,
     count: decision.state.count,
     window_start: new Date(decision.state.windowStart).toISOString(),
-    locked_until: decision.state.lockedUntil ? new Date(decision.state.lockedUntil).toISOString() : null,
+    locked_until: decision.state.lockedUntil
+      ? new Date(decision.state.lockedUntil).toISOString()
+      : null,
   });
   if (writeError) {
     throw new Error(`auth_rate_limits: écriture impossible (${scope})`);
@@ -98,7 +100,10 @@ export async function resetRateLimit(scope: string, identifier: string): Promise
  * — même réponse pour un bon ou un mauvais mot de passe (pas d'oracle).
  * Retourne le délai restant en secondes, ou null si non verrouillé.
  */
-export async function getRateLimitLockSeconds(scope: string, identifier: string): Promise<number | null> {
+export async function getRateLimitLockSeconds(
+  scope: string,
+  identifier: string,
+): Promise<number | null> {
   const supabase = createServiceRoleClient();
   const { data: row, error } = await supabase
     .from("auth_rate_limits")

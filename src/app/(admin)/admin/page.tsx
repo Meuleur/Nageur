@@ -39,8 +39,8 @@ export default async function AdminPage() {
         <CardHeader>
           <CardTitle>Administration</CardTitle>
           <CardDescription>
-            Les métriques, la gestion des fournisseurs LLM et les affectations coach ↔ nageur
-            (E-30 à E-33) arrivent avec un prochain chantier. Cet écran confirme simplement votre
+            Les métriques, la gestion des fournisseurs LLM et les affectations coach ↔ nageur (E-30
+            à E-33) arrivent avec un prochain chantier. Cet écran confirme simplement votre
             authentification et votre rôle.
           </CardDescription>
         </CardHeader>

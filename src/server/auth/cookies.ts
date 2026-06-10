@@ -50,7 +50,12 @@ function buildCookie(name: string, token: string, expiresAtMs: number): CookieTo
 /** Pose l'état « OTP en attente » ; retourne son échéance (epoch ms). */
 export async function setPending2faCookie(sub: string, authAt: number): Promise<number> {
   const exp = Math.min(Date.now() + PENDING_2FA_TTL_MS, authAt + PENDING_2FA_MAX_MS);
-  const token = createTransitionToken(getAuthSecret(), { purpose: "pending-2fa", sub, authAt, exp });
+  const token = createTransitionToken(getAuthSecret(), {
+    purpose: "pending-2fa",
+    sub,
+    authAt,
+    exp,
+  });
   const cookie = buildCookie(PENDING_2FA_COOKIE, token, exp);
   (await cookies()).set(cookie.name, cookie.value, cookie.options);
   return exp;
@@ -72,7 +77,12 @@ export async function clearPending2faCookie(): Promise<void> {
 export function buildResetCookie(sub: string): CookieToSet {
   const now = Date.now();
   const exp = now + RESET_TTL_MS;
-  const token = createTransitionToken(getAuthSecret(), { purpose: "password-reset", sub, authAt: now, exp });
+  const token = createTransitionToken(getAuthSecret(), {
+    purpose: "password-reset",
+    sub,
+    authAt: now,
+    exp,
+  });
   return buildCookie(RESET_COOKIE, token, exp);
 }
 

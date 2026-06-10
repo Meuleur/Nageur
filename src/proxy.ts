@@ -61,7 +61,9 @@ export async function proxy(request: NextRequest) {
   const protectedEntry = PROTECTED_PREFIXES.find(
     ({ prefix }) => pathname === prefix || pathname.startsWith(`${prefix}/`),
   );
-  const isAuthPage = AUTH_PAGES.some((page) => pathname === page || pathname.startsWith(`${page}/`));
+  const isAuthPage = AUTH_PAGES.some(
+    (page) => pathname === page || pathname.startsWith(`${page}/`),
+  );
 
   if (!user) {
     if (protectedEntry || pathname === "/") {
@@ -70,7 +72,11 @@ export async function proxy(request: NextRequest) {
     return response;
   }
 
-  const { data: profile } = await supabase.from("profiles").select("role").eq("id", user.id).single();
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("role")
+    .eq("id", user.id)
+    .single();
   const role = (profile?.role ?? null) as AppRole | null;
   if (!role) {
     // Compte auth sans profil applicatif : anomalie — on coupe la session
@@ -93,5 +99,7 @@ export const config = {
   // Tout sauf les ressources statiques ; /auth/confirm passe ici aussi mais
   // n'est ni protégé ni listé comme écran d'auth : il reste accessible
   // connecté comme déconnecté.
-  matcher: ["/((?!_next/static|_next/image|favicon\\.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico|txt|xml)$).*)"],
+  matcher: [
+    "/((?!_next/static|_next/image|favicon\\.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico|txt|xml)$).*)",
+  ],
 };

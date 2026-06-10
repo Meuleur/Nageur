@@ -29,14 +29,18 @@ test("inscription, blocage avant vérification, lien de vérification, première
   await page.getByLabel("Mot de passe").fill(PASSWORD);
   await page.getByRole("button", { name: "Se connecter" }).click();
   await expect(page).toHaveURL(/\/verification-email\?motif=non-verifie/);
-  await expect(page.locator('[data-slot="alert"][role="status"]')).toContainText("pas encore vérifiée");
+  await expect(page.locator('[data-slot="alert"][role="status"]')).toContainText(
+    "pas encore vérifiée",
+  );
 
   // Lien de vérification (e-mail GoTrue, gabarit français → /auth/confirm).
   const confirmEmail = await waitForEmail(email, { afterId: null });
   expect(confirmEmail.subject).toBe("Confirmez votre adresse e-mail");
   await page.goto(extractConfirmLink(confirmEmail));
   await expect(page).toHaveURL(/\/connexion\?motif=email-verifie/);
-  await expect(page.locator('[data-slot="alert"][role="status"]')).toContainText("Adresse e-mail vérifiée");
+  await expect(page.locator('[data-slot="alert"][role="status"]')).toContainText(
+    "Adresse e-mail vérifiée",
+  );
 
   // Première connexion complète : mot de passe + OTP.
   const inboxAfterConfirm = await latestEmailId(email);

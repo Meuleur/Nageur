@@ -14,8 +14,7 @@ export default function InscriptionPage() {
         <CardHeader>
           <CardTitle>Créer mon compte nageur</CardTitle>
           <CardDescription>
-            Une vérification de votre adresse e-mail vous sera demandée avant la première
-            connexion.
+            Une vérification de votre adresse e-mail vous sera demandée avant la première connexion.
           </CardDescription>
         </CardHeader>
         <CardContent>

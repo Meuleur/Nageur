@@ -21,7 +21,7 @@ describe("decideRateLimit", () => {
   });
 
   it("compte dans la fenêtre et autorise jusqu'à la limite", () => {
-    let state: RateLimitState = { count: 1, windowStart: NOW, lockedUntil: null };
+    const state: RateLimitState = { count: 1, windowStart: NOW, lockedUntil: null };
     let decision = decideRateLimit(state, NOW + MINUTE, policy);
     expect(decision).toMatchObject({ allowed: true, state: { count: 2 } });
     decision = decideRateLimit(decision.state, NOW + 2 * MINUTE, policy);

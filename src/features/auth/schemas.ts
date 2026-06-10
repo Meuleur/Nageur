@@ -35,11 +35,7 @@ const emailSchema = z
   .pipe(z.email("Adresse e-mail invalide."));
 
 const nameSchema = (label: string) =>
-  z
-    .string(`${label} requis.`)
-    .trim()
-    .min(1, `${label} requis.`)
-    .max(50, "Au plus 50 caractères.");
+  z.string(`${label} requis.`).trim().min(1, `${label} requis.`).max(50, "Au plus 50 caractères.");
 
 /** Inscription nageur (RG-02, E-01). */
 export const signupSchema = z.object({

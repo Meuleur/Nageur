@@ -54,7 +54,11 @@ export type OtpDecision =
  * Évalue UNE tentative déjà comptée (record.attempts inclut la tentative
  * courante, réservée atomiquement par le service).
  */
-export function decideOtpAttempt(record: OtpRecord, candidateHash: string, now: number): OtpDecision {
+export function decideOtpAttempt(
+  record: OtpRecord,
+  candidateHash: string,
+  now: number,
+): OtpDecision {
   if (record.used) {
     return { status: "expired" };
   }
@@ -66,7 +70,9 @@ export function decideOtpAttempt(record: OtpRecord, candidateHash: string, now: 
   }
   if (!otpHashesMatch(record.code_hash, candidateHash)) {
     const remainingAttempts = Math.max(0, OTP_MAX_ATTEMPTS - record.attempts);
-    return remainingAttempts === 0 ? { status: "locked" } : { status: "mismatch", remainingAttempts };
+    return remainingAttempts === 0
+      ? { status: "locked" }
+      : { status: "mismatch", remainingAttempts };
   }
   return { status: "ok" };
 }

@@ -10,7 +10,10 @@ export function AuthTabs({ active }: { active: "connexion" | "inscription" }) {
   ] as const;
 
   return (
-    <nav className="grid grid-cols-2 gap-1 rounded-md bg-muted p-1" aria-label="Connexion ou inscription">
+    <nav
+      className="grid grid-cols-2 gap-1 rounded-md bg-muted p-1"
+      aria-label="Connexion ou inscription"
+    >
       {tabs.map((tab) => (
         <Link
           key={tab.key}

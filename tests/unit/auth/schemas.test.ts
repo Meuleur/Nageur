@@ -97,8 +97,8 @@ describe("newPasswordSchema", () => {
   });
 
   it("applique la politique au nouveau mot de passe", () => {
-    expect(
-      newPasswordSchema.safeParse({ password: "court", confirmation: "court" }).success,
-    ).toBe(false);
+    expect(newPasswordSchema.safeParse({ password: "court", confirmation: "court" }).success).toBe(
+      false,
+    );
   });
 });

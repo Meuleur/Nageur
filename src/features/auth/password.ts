@@ -69,7 +69,9 @@ const COMMON_PASSWORD_CORES = new Set([
 export function isCommonPassword(password: string): boolean {
   const lower = password.toLowerCase();
   const candidates = [lower, lower.replace(/[^a-z0-9]/g, ""), lower.replace(/[^a-z]/g, "")];
-  return candidates.some((candidate) => candidate.length > 0 && COMMON_PASSWORD_CORES.has(candidate));
+  return candidates.some(
+    (candidate) => candidate.length > 0 && COMMON_PASSWORD_CORES.has(candidate),
+  );
 }
 
 export type PasswordIssue = "longueur" | "categories" | "courant";

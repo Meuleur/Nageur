@@ -43,7 +43,9 @@ test.describe("Connexion + 2FA", () => {
     const wrongCode = code === "000000" ? "111111" : "000000";
     await page.getByLabel("Code reçu par e-mail").fill(wrongCode);
     await page.getByRole("button", { name: "Valider" }).click();
-    await expect(page.locator('[data-slot="alert"][role="alert"]')).toContainText("Il vous reste 4 tentatives");
+    await expect(page.locator('[data-slot="alert"][role="alert"]')).toContainText(
+      "Il vous reste 4 tentatives",
+    );
 
     // Bon code : la session est ENFIN établie, redirection selon le rôle.
     await page.getByLabel("Code reçu par e-mail").fill(code);
@@ -77,7 +79,9 @@ test.describe("Connexion + 2FA", () => {
     await page.getByLabel("Adresse e-mail").fill(user.email);
     await page.getByLabel("Mot de passe").fill("MauvaisMotDePasse1!");
     await page.getByRole("button", { name: "Se connecter" }).click();
-    await expect(page.locator('[data-slot="alert"][role="alert"]')).toContainText("Identifiants invalides");
+    await expect(page.locator('[data-slot="alert"][role="alert"]')).toContainText(
+      "Identifiants invalides",
+    );
     await expect(page).toHaveURL(/\/connexion/);
   });
 });

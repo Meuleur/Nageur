@@ -44,7 +44,10 @@ export default async function VerificationEmailPage({
         ) : null}
         <VerificationEmailPanel />
         <p className="text-center">
-          <Link href="/connexion" className="text-sm text-primary underline-offset-4 hover:underline">
+          <Link
+            href="/connexion"
+            className="text-sm text-primary underline-offset-4 hover:underline"
+          >
             Retour à la connexion
           </Link>
         </p>

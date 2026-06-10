@@ -20,7 +20,9 @@ test("réinitialisation du mot de passe de bout en bout", async ({ page }, testI
   await page.goto("/mot-de-passe-oublie");
   await page.getByLabel("Adresse e-mail").fill(email);
   await page.getByRole("button", { name: "Envoyer le lien de réinitialisation" }).click();
-  await expect(page.locator('[data-slot="alert"][role="status"]')).toContainText("Si un compte existe pour cette adresse");
+  await expect(page.locator('[data-slot="alert"][role="status"]')).toContainText(
+    "Si un compte existe pour cette adresse",
+  );
 
   // Lien de réinitialisation (e-mail GoTrue) → écran nouveau mot de passe.
   const resetEmail = await waitForEmail(email, { afterId: inboxBefore });
@@ -33,13 +35,17 @@ test("réinitialisation du mot de passe de bout en bout", async ({ page }, testI
   await page.getByLabel("Confirmer le mot de passe").fill(NEW_PASSWORD);
   await page.getByRole("button", { name: "Définir ce mot de passe" }).click();
   await expect(page).toHaveURL(/\/connexion\?motif=mot-de-passe-modifie/);
-  await expect(page.locator('[data-slot="alert"][role="status"]')).toContainText("Mot de passe modifié");
+  await expect(page.locator('[data-slot="alert"][role="status"]')).toContainText(
+    "Mot de passe modifié",
+  );
 
   // L'ancien mot de passe ne fonctionne plus.
   await page.getByLabel("Adresse e-mail").fill(email);
   await page.getByLabel("Mot de passe").fill(OLD_PASSWORD);
   await page.getByRole("button", { name: "Se connecter" }).click();
-  await expect(page.locator('[data-slot="alert"][role="alert"]')).toContainText("Identifiants invalides");
+  await expect(page.locator('[data-slot="alert"][role="alert"]')).toContainText(
+    "Identifiants invalides",
+  );
 
   // Le nouveau mot de passe ouvre le parcours 2FA complet.
   // (React 19 réinitialise le formulaire après l'action : tout re-remplir.)

@@ -28,7 +28,13 @@ import { issueOtpCode, verifyOtpCode } from "@/server/otp";
 
 import type { AuthFormState } from "./form-state";
 import { ROLE_HOME } from "./routes";
-import { emailOnlySchema, loginSchema, newPasswordSchema, otpSchema, signupSchema } from "./schemas";
+import {
+  emailOnlySchema,
+  loginSchema,
+  newPasswordSchema,
+  otpSchema,
+  signupSchema,
+} from "./schemas";
 
 /**
  * Actions serveur d'authentification (C1) — toutes les règles de sécurité
@@ -59,7 +65,10 @@ function fieldErrors(error: z.ZodError): AuthFormState {
 // ---------------------------------------------------------------------------
 // Inscription (E-01, PN-1, RG-02, RG-04, RG-05)
 // ---------------------------------------------------------------------------
-export async function signupAction(_prev: AuthFormState, formData: FormData): Promise<AuthFormState> {
+export async function signupAction(
+  _prev: AuthFormState,
+  formData: FormData,
+): Promise<AuthFormState> {
   const parsed = signupSchema.safeParse({
     prenom: formData.get("prenom"),
     nom: formData.get("nom"),
@@ -124,7 +133,10 @@ export async function signupAction(_prev: AuthFormState, formData: FormData): Pr
       return { status: "error", message: GENERIC_ERROR };
     }
 
-    await logAuthEvent("auth.signup", { actorId: data.user?.id ?? null, metadata: { role: "nageur" } });
+    await logAuthEvent("auth.signup", {
+      actorId: data.user?.id ?? null,
+      metadata: { role: "nageur" },
+    });
   } catch {
     return { status: "error", message: GENERIC_ERROR };
   }
@@ -135,7 +147,10 @@ export async function signupAction(_prev: AuthFormState, formData: FormData): Pr
 // ---------------------------------------------------------------------------
 // Connexion — étape 1 : mot de passe (E-01, PN-2, RG-06)
 // ---------------------------------------------------------------------------
-export async function loginAction(_prev: AuthFormState, formData: FormData): Promise<AuthFormState> {
+export async function loginAction(
+  _prev: AuthFormState,
+  formData: FormData,
+): Promise<AuthFormState> {
   const parsed = loginSchema.safeParse({
     email: formData.get("email"),
     password: formData.get("password"),
@@ -235,7 +250,10 @@ export async function loginAction(_prev: AuthFormState, formData: FormData): Pro
 // ---------------------------------------------------------------------------
 // Connexion — étape 2 : code OTP (E-02, PN-2, RG-06 à RG-08)
 // ---------------------------------------------------------------------------
-export async function verifyOtpAction(_prev: AuthFormState, formData: FormData): Promise<AuthFormState> {
+export async function verifyOtpAction(
+  _prev: AuthFormState,
+  formData: FormData,
+): Promise<AuthFormState> {
   let destination: string | null = null;
   let pendingExpired = false;
 
@@ -248,7 +266,11 @@ export async function verifyOtpAction(_prev: AuthFormState, formData: FormData):
     } else if (!parsed.success) {
       return fieldErrors(parsed.error);
     } else {
-      const ipRate = await consumeRateLimit("otp:verif-ip", await clientIp(), RATE_LIMITS.otpVerifyByIp);
+      const ipRate = await consumeRateLimit(
+        "otp:verif-ip",
+        await clientIp(),
+        RATE_LIMITS.otpVerifyByIp,
+      );
       if (!ipRate.allowed) {
         await logAuthEvent("auth.rate_limited", { metadata: { scope: "otp-verif" } });
         return { status: "error", message: TOO_MANY_ATTEMPTS };
@@ -284,7 +306,9 @@ export async function verifyOtpAction(_prev: AuthFormState, formData: FormData):
 
       // Code valide : l'adresse e-mail vient du compte (jamais du client).
       const service = createServiceRoleClient();
-      const { data: userData, error: userError } = await service.auth.admin.getUserById(pending.sub);
+      const { data: userData, error: userError } = await service.auth.admin.getUserById(
+        pending.sub,
+      );
       if (userError || !userData.user?.email) {
         return { status: "error", message: GENERIC_ERROR };
       }
@@ -310,14 +334,10 @@ export async function verifyOtpAction(_prev: AuthFormState, formData: FormData):
 // ---------------------------------------------------------------------------
 // Renvoi d'un code OTP (E-02, ADR-018 : 60 s entre deux envois)
 // ---------------------------------------------------------------------------
-export async function resendOtpAction(_prev: AuthFormState): Promise<AuthFormState> {
-  let pendingExpired = false;
-
+export async function resendOtpAction(): Promise<AuthFormState> {
   try {
     const pending = await readPending2fa();
-    if (!pending) {
-      pendingExpired = true;
-    } else {
+    if (pending) {
       const cooldown = await consumeRateLimit("otp:envoi", pending.sub, RATE_LIMITS.otpSendByUser);
       if (!cooldown.allowed) {
         return {
@@ -326,14 +346,23 @@ export async function resendOtpAction(_prev: AuthFormState): Promise<AuthFormSta
           resendAvailableInSeconds: cooldown.retryAfterSeconds,
         };
       }
-      const hourly = await consumeRateLimit("otp:envoi-heure", pending.sub, RATE_LIMITS.otpSendHourlyByUser);
+      const hourly = await consumeRateLimit(
+        "otp:envoi-heure",
+        pending.sub,
+        RATE_LIMITS.otpSendHourlyByUser,
+      );
       if (!hourly.allowed) {
-        await logAuthEvent("auth.rate_limited", { actorId: pending.sub, metadata: { scope: "otp-envoi" } });
+        await logAuthEvent("auth.rate_limited", {
+          actorId: pending.sub,
+          metadata: { scope: "otp-envoi" },
+        });
         return { status: "error", message: TOO_MANY_ATTEMPTS };
       }
 
       const service = createServiceRoleClient();
-      const { data: userData, error: userError } = await service.auth.admin.getUserById(pending.sub);
+      const { data: userData, error: userError } = await service.auth.admin.getUserById(
+        pending.sub,
+      );
       if (userError || !userData.user?.email) {
         return { status: "error", message: GENERIC_ERROR };
       }
@@ -352,6 +381,7 @@ export async function resendOtpAction(_prev: AuthFormState): Promise<AuthFormSta
     return { status: "error", message: GENERIC_ERROR };
   }
 
+  // État « OTP en attente » absent ou expiré : retour à la connexion.
   redirect("/connexion?motif=session-2fa-expiree");
 }
 
@@ -415,7 +445,11 @@ export async function requestPasswordResetAction(
 
   try {
     const ipRate = await consumeRateLimit("reset:ip", await clientIp(), RATE_LIMITS.resetByIp);
-    const emailRate = await consumeRateLimit("reset:email", parsed.data.email, RATE_LIMITS.resetByEmail);
+    const emailRate = await consumeRateLimit(
+      "reset:email",
+      parsed.data.email,
+      RATE_LIMITS.resetByEmail,
+    );
     if (!ipRate.allowed || !emailRate.allowed) {
       await logAuthEvent("auth.rate_limited", { metadata: { scope: "reset" } });
       return generic;

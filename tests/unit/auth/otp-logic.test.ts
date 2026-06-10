@@ -102,8 +102,8 @@ describe("decideOtpAttempt", () => {
   });
 
   it("au-delà du plafond (réservation concurrente), tout est verrouillé", () => {
-    expect(
-      decideOtpAttempt(record({ attempts: OTP_MAX_ATTEMPTS + 1 }), goodHash, NOW).status,
-    ).toBe("locked");
+    expect(decideOtpAttempt(record({ attempts: OTP_MAX_ATTEMPTS + 1 }), goodHash, NOW).status).toBe(
+      "locked",
+    );
   });
 });
