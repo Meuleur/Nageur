@@ -26,6 +26,7 @@ import { buildOtpEmail } from "@/server/email/otp-email";
 import { sendMail } from "@/server/email";
 import { issueOtpCode, verifyOtpCode } from "@/server/otp";
 
+import type { AuthFormState } from "./form-state";
 import { ROLE_HOME } from "./routes";
 import { emailOnlySchema, loginSchema, newPasswordSchema, otpSchema, signupSchema } from "./schemas";
 
@@ -34,20 +35,9 @@ import { emailOnlySchema, loginSchema, newPasswordSchema, otpSchema, signupSchem
  * (gating du second facteur, limitation de débit, verrouillage, réponses
  * génériques) vivent ICI, côté serveur ; le client n'apporte que l'UX.
  * Aucun mot de passe, code OTP ou jeton n'est journalisé (C1/D3).
+ * (Un fichier "use server" n'exporte que des fonctions async — l'état des
+ * formulaires vit dans ./form-state.)
  */
-export type AuthFormState = {
-  status: "idle" | "error" | "success";
-  message?: string;
-  fieldErrors?: Record<string, string[] | undefined>;
-  /** E-02 : tentatives restantes sur le code courant (RG-07). */
-  remainingAttempts?: number;
-  /** E-02 : échéance du code / de l'état d'attente (epoch ms, compte à rebours). */
-  otpExpiresAt?: number;
-  /** E-02 : anti-spam de renvoi — patienter avant le prochain envoi. */
-  resendAvailableInSeconds?: number;
-};
-
-export const AUTH_FORM_IDLE: AuthFormState = { status: "idle" };
 
 const GENERIC_ERROR = "Une erreur est survenue. Réessayez dans un instant.";
 const TOO_MANY_ATTEMPTS = "Trop de tentatives. Réessayez plus tard.";
