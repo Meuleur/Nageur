@@ -1,36 +1,87 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# App Natation
 
-## Getting Started
+Web app de génération de séances de natation assistée par IA, validées par un coach.
+Conception complète dans le dossier `App Nageur/conception/` (documents A–F) ; ce dépôt
+applique strictement la stack D1, l'architecture D2, l'infrastructure D3 et la charte B4.
 
-First, run the development server:
+## Stack (D1)
+
+Next.js (App Router) · TypeScript strict · Tailwind CSS v4 · shadcn/ui (Radix) ·
+Framer Motion · React Hook Form · Zod · TanStack Query · Supabase (Postgres, Auth, Storage) ·
+Vitest · Playwright · pnpm.
+
+## Prérequis
+
+- Node.js ≥ 22
+- pnpm ≥ 10 (`corepack enable pnpm` si besoin)
+
+## Installation
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+pnpm install
+cp .env.example .env.local   # puis renseigner les valeurs (projet Supabase de dev)
+pnpm dev                     # http://localhost:3000
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+La page d'accueil est une démonstration de la charte (B4) : palette, typographie Inter,
+boutons, badges de statut, cartes et micro-animations. Aucune logique métier (chantier CH0).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Scripts
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+| Script              | Rôle                                     |
+| ------------------- | ---------------------------------------- |
+| `pnpm dev`          | serveur de développement                 |
+| `pnpm build`        | build de production                      |
+| `pnpm start`        | sert le build de production              |
+| `pnpm lint`         | ESLint                                   |
+| `pnpm typecheck`    | vérification TypeScript (`tsc --noEmit`) |
+| `pnpm test`         | tests unitaires (Vitest)                 |
+| `pnpm test:e2e`     | tests E2E (Playwright)¹                  |
+| `pnpm format`       | formatage Prettier (écriture)            |
+| `pnpm format:check` | vérification du formatage                |
 
-## Learn More
+¹ Nécessite une fois `pnpm exec playwright install`. Aucun scénario en CH0 (config de base).
 
-To learn more about Next.js, take a look at the following resources:
+## Structure (D2)
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```
+src/
+  app/                  # routes Next.js (App Router) + groupes (auth)/(nageur)/(coach)/(admin)
+    api/                # Route Handlers (opérations serveur)
+  features/             # logique métier par domaine (auth, profil, seances, validation, admin, evaluation)
+  server/               # services serveur uniquement : llm/, email/, otp/, metrics/, data/
+  lib/                  # utilitaires, clients Supabase, config
+  components/ui/        # primitives shadcn/ui adaptées à la charte B4
+  styles/               # tokens de design B4 (tokens.css) + styles globaux
+tests/                  # unit/ (Vitest) + e2e/ (Playwright)
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Séparation stricte client/serveur : `src/lib/supabase/client.ts` (clé anon, soumise à la RLS)
+côté navigateur ; `src/lib/supabase/server.ts` (clé service role, protégée par `server-only`)
+réservé aux opérations privilégiées. Aucun secret côté client.
 
-## Deploy on Vercel
+## Environnements & secrets (D3)
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Trois environnements isolés : **dev** (local, `.env.local`), **staging** et **production**
+(variables d'environnement Vercel par environnement). Un projet Supabase distinct par
+environnement. **Aucun secret n'est committé** : `.env.example` liste les variables sans
+valeurs ; `.gitignore` exclut tous les `.env*`.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Déploiement (à configurer au moment du déploiement)
+
+- **Vercel — région UE obligatoire** (ADR-021) : forcer l'exécution des fonctions serveur
+  en UE (ex. `fra1`) dans les réglages du projet Vercel.
+- **Supabase — région UE (Frankfurt)** (ADR-006), un projet par environnement.
+- Variables d'environnement Vercel à renseigner par environnement (cf. `.env.example`).
+- Protection de la branche `main` recommandée (PR obligatoire, pas de push direct — F3).
+
+## Intégration continue
+
+GitHub Actions (`.github/workflows/ci.yml`) : lint, typecheck, tests unitaires et build
+à chaque push et pull request.
+
+## Workflow Git (F3)
+
+`main` = référence déployée en production, jamais de push direct. Un chantier = une branche
+`chantier/CHx-…` → Pull Request vers `main` → revue → merge (décision humaine).
+Commits courts en anglais au format `type: sujet` (`feat`, `fix`, `chore`, `test`, `docs`, `refactor`).
