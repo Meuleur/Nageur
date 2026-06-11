@@ -15,6 +15,7 @@ import {
   type LucideIcon,
 } from "lucide-react";
 
+import { EntreeAnimee } from "@/components/ui/entree-animee";
 import { LogoutButton } from "@/features/auth/components/logout-button";
 import { cn } from "@/lib/utils";
 
@@ -118,8 +119,10 @@ export function AppShell({ role, children }: { role: RoleNav; children: React.Re
       </header>
 
       {/* Contenu — dégagé de la barre latérale (desktop) et de la barre
-          inférieure (mobile). */}
-      <div className="flex flex-1 flex-col pb-24 lg:pb-0 lg:pl-60">{children}</div>
+          inférieure (mobile) ; entrée animée homogène (B4). */}
+      <EntreeAnimee className="flex flex-1 flex-col pb-24 lg:pb-0 lg:pl-60">
+        {children}
+      </EntreeAnimee>
 
       {/* Barre inférieure — mobile/tablette uniquement. */}
       <nav
