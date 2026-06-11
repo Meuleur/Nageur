@@ -26,12 +26,21 @@ export default async function AccueilPage() {
     redirect("/connexion");
   }
 
-  const [{ data: profile }, { data: coach }, { data: profilSportif }] = await Promise.all([
+  const [
+    { data: profile, error: erreurProfil },
+    { data: coach, error: erreurCoach },
+    { data: profilSportif, error: erreurProfilSportif },
+  ] = await Promise.all([
     supabase.from("profiles").select("prenom").eq("id", user.id).single(),
     // Vue dédiée my_coach (ADR-024) : prénom + nom du coach affecté, ou vide.
     supabase.from("my_coach").select("prenom, nom").maybeSingle(),
     supabase.from("swimmer_profiles").select("nageur_id").eq("nageur_id", user.id).maybeSingle(),
   ]);
+  if (erreurProfil || erreurCoach || erreurProfilSportif) {
+    // Sans cela, un échec de lecture afficherait à tort « pas de coach » —
+    // l'écran d'erreur du groupe (error.tsx) propose de réessayer.
+    throw new Error("accueil nageur : lecture impossible");
+  }
 
   return (
     <main className="mx-auto w-full max-w-3xl flex-1 space-y-6 px-4 py-10 sm:px-6">

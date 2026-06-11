@@ -24,7 +24,10 @@ export default async function ProfilPage() {
     redirect("/connexion");
   }
 
-  const [{ data: profil }, { data: creneaux }] = await Promise.all([
+  const [
+    { data: profil, error: erreurProfil },
+    { data: creneaux, error: erreurCreneaux },
+  ] = await Promise.all([
     supabase
       .from("swimmer_profiles")
       .select("niveau, frequence, duree, bassin, objectifs, materiel")
@@ -32,6 +35,11 @@ export default async function ProfilPage() {
       .maybeSingle(),
     supabase.from("swimmer_availabilities").select("jour, moment").eq("nageur_id", user.id),
   ]);
+  if (erreurProfil || erreurCreneaux) {
+    // Sans cela, un échec de lecture présenterait un formulaire vierge que
+    // l'enregistrement écraserait — l'écran d'erreur du groupe prend le relais.
+    throw new Error("profil nageur : lecture impossible");
+  }
 
   const initial: ProfilInitial = {
     niveau: profil?.niveau ?? null,
