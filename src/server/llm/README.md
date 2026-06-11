@@ -58,6 +58,15 @@ donnée personnelle, de prompt ni de clé).
   Le seed installe des clés **factices** (`sk-ant-seed-cle-factice`) pour que
   dev/CI aient une configuration déchiffrable sans secret réel.
 
+## Pilote simulé (CH5, dev/E2E)
+
+`LLM_DRIVER=simule` remplace l'appel fournisseur par une séance déterministe
+([providers/simule.ts](providers/simule.ts)) — valide pour le schéma C2,
+dimensionnée sur la durée cible du prompt, sans réseau. Tout le reste du flux
+(préconditions, validation Zod, persistance, audit) reste réel. Usage : dev
+local sans clé réelle et tests E2E (Playwright démarre son serveur avec cette
+variable). Jamais en production — défaut : `fournisseur`.
+
 ## Tests (D2 : fournisseurs simulés, pas de réseau en CI)
 
 - `tests/unit/llm/providers.test.ts` — transport `fetch` simulé des SDK :

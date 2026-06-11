@@ -16,6 +16,7 @@ export const ROLE_HOME: Record<AppRole, string> = {
 export const PROTECTED_PREFIXES: ReadonlyArray<{ prefix: string; role: AppRole }> = [
   { prefix: "/accueil", role: "nageur" },
   { prefix: "/profil", role: "nageur" },
+  { prefix: "/seances", role: "nageur" },
   { prefix: "/coach", role: "coach" },
   { prefix: "/admin", role: "super_admin" },
 ];

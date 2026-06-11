@@ -14,8 +14,8 @@ export const metadata: Metadata = { title: "Accueil — App Natation" };
  * E-10 — Accueil nageur (PN-3) : coach affiché via la vue `my_coach`
  * uniquement (prénom + nom, jamais l'e-mail — ADR-024) et accès rapides.
  * Sans coach (RG-13/RG-14, ADR-014) : bandeau dédié, génération indisponible,
- * profil accessible. Le bouton de génération sera branché en CH4/CH5 —
- * emplacement prévu, désactivé pour l'instant.
+ * profil accessible. Accès rapides CH5 : génération (E-12) et liste des
+ * séances (E-13).
  */
 export default async function AccueilPage() {
   const supabase = await createSessionClient();
@@ -99,18 +99,21 @@ export default async function AccueilPage() {
             </CardTitle>
             <CardDescription>
               {coach
-                ? "Bientôt disponible : une séance proposée par l'IA, validée par votre coach."
+                ? "Une séance proposée par l'IA, validée par votre coach."
                 : "Indisponible tant qu'aucun coach ne vous est affecté."}
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <Button
-              disabled
-              className="w-full"
-              title={coach ? "Disponible prochainement" : "Indisponible sans coach affecté"}
-            >
-              Générer ma séance
-            </Button>
+            {coach ? (
+              <Button asChild className="w-full">
+                <Link href="/seances/generer">Générer ma séance</Link>
+              </Button>
+            ) : (
+              // RG-14 / ADR-014 : action désactivée avec explication (E-10).
+              <Button disabled className="w-full" title="Indisponible sans coach affecté">
+                Générer ma séance
+              </Button>
+            )}
           </CardContent>
         </Card>
 
@@ -121,12 +124,12 @@ export default async function AccueilPage() {
               Mes séances
             </CardTitle>
             <CardDescription>
-              Bientôt disponible : retrouvez ici vos séances et leur statut.
+              Retrouvez toutes vos séances et leur statut de validation.
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <Button disabled variant="outline" className="w-full" title="Disponible prochainement">
-              Voir mes séances
+            <Button asChild variant="outline" className="w-full">
+              <Link href="/seances">Voir mes séances</Link>
             </Button>
           </CardContent>
         </Card>
