@@ -108,11 +108,11 @@ select results_eq('select count(*)::int from public.seances', array[0],
   'nageur sans coach : aucune séance visible');
 
 -- ---------------------------------------------------------------------------
--- Coach Camille — nageurs affectés : Léa et Noah (RG-25).
+-- Coach Camille — nageurs affectés : Léa, Noah et Mia (RG-25).
 -- ---------------------------------------------------------------------------
 select pg_temp.connecter('20000000-0000-4000-8000-000000000001');
 
-select results_eq('select count(*)::int from public.profiles', array[3],
+select results_eq('select count(*)::int from public.profiles', array[4],
   'coach : voit son profil et ceux de ses nageurs affectés uniquement');
 select results_eq('select count(*)::int from public.swimmer_profiles', array[2],
   'coach : voit les profils sportifs de ses nageurs uniquement');
@@ -156,12 +156,12 @@ select results_eq(
   'coach : ne peut pas modifier le profil d''un nageur');
 
 -- ---------------------------------------------------------------------------
--- Coach Alex — nageuse affectée : Emma.
+-- Coach Alex — nageuses affectées : Emma et Zoé.
 -- ---------------------------------------------------------------------------
 select pg_temp.connecter('20000000-0000-4000-8000-000000000002');
 
-select results_eq('select count(*)::int from public.profiles', array[2],
-  'coach 2 : voit son profil et celui d''Emma uniquement');
+select results_eq('select count(*)::int from public.profiles', array[3],
+  'coach 2 : voit son profil et ceux d''Emma et Zoé uniquement');
 select results_eq('select count(*)::int from public.seances', array[2],
   'coach 2 : voit les séances d''Emma uniquement');
 select results_eq('select count(*)::int from public.auto_evaluations', array[0],
@@ -172,7 +172,7 @@ select results_eq('select count(*)::int from public.auto_evaluations', array[0],
 -- ---------------------------------------------------------------------------
 select pg_temp.connecter('10000000-0000-4000-8000-000000000001');
 
-select results_eq('select count(*)::int from public.profiles', array[7],
+select results_eq('select count(*)::int from public.profiles', array[11],
   'admin : lit toutes les identités, rôles et affectations');
 select results_eq('select count(*)::int from public.swimmer_profiles', array[0],
   'admin : pas d''accès aux profils sportifs');
@@ -198,14 +198,14 @@ select throws_ok(
 -- ---------------------------------------------------------------------------
 select pg_temp.connecter('20000000-0000-4000-8000-000000000002');
 
-select results_eq('select count(*)::int from public.profiles', array[3],
+select results_eq('select count(*)::int from public.profiles', array[4],
   'réaffectation : le nouveau coach voit le profil de Léa');
 select results_eq('select count(*)::int from public.seances', array[4],
   'réaffectation : le nouveau coach accède à l''historique de Léa (RG-15)');
 
 select pg_temp.connecter('20000000-0000-4000-8000-000000000001');
 
-select results_eq('select count(*)::int from public.profiles', array[2],
+select results_eq('select count(*)::int from public.profiles', array[3],
   'réaffectation : l''ancien coach ne voit plus le profil de Léa');
 select results_eq('select count(*)::int from public.seances', array[1],
   'réaffectation : l''ancien coach n''accède plus aux séances de Léa');
