@@ -2,6 +2,7 @@ import Anthropic from "@anthropic-ai/sdk";
 
 import { GenerationSeanceError } from "../errors";
 import { SCHEMA_JSON_SEANCE } from "../json-schema";
+import { accepteTemperature } from "./echantillonnage";
 import {
   MAX_TOKENS_SORTIE,
   TEMPERATURE,
@@ -34,7 +35,9 @@ export function createAnthropicClient(options: OptionsClientLlm): ClientLlm {
         reponse = await client.messages.create({
           model: options.modele,
           max_tokens: MAX_TOKENS_SORTIE,
-          temperature: TEMPERATURE,
+          // ADR-025 : Opus 4.7+/Fable rejettent les paramètres
+          // d'échantillonnage — la température est omise pour ces modèles.
+          ...(accepteTemperature(options.modele) ? { temperature: TEMPERATURE } : {}),
           system: requete.systeme,
           messages: [{ role: "user", content: requete.utilisateur }],
           output_config: {
