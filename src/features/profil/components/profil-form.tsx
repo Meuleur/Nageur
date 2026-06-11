@@ -1,12 +1,13 @@
 "use client";
 
 import { Fragment, useActionState, useState } from "react";
-import { Check, CheckCircle2, Loader2 } from "lucide-react";
+import { CheckCircle2, Loader2 } from "lucide-react";
 import { z } from "zod";
 
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { ChoixChip } from "@/components/ui/choix-chip";
 
 import { enregistrerProfilAction } from "../actions";
 import { JOURS, MOMENTS } from "../creneaux";
@@ -92,43 +93,6 @@ function ChampGroupe({
         <ErreursChamp id={errorId} errors={errors} />
       </div>
     </fieldset>
-  );
-}
-
-/** Pastille sélectionnable (radio ou case) — état coché visible au-delà de la couleur (B4). */
-function ChoixChip({
-  type,
-  name,
-  value,
-  label,
-  ariaLabel,
-  checked,
-  onChange,
-}: {
-  type: "radio" | "checkbox";
-  name: string;
-  value: string;
-  label: string;
-  ariaLabel?: string;
-  checked: boolean;
-  onChange: () => void;
-}) {
-  return (
-    <label className="cursor-pointer">
-      <input
-        type={type}
-        name={name}
-        value={value}
-        checked={checked}
-        onChange={onChange}
-        aria-label={ariaLabel}
-        className="peer sr-only"
-      />
-      <span className="inline-flex min-h-11 items-center gap-1.5 rounded-full border border-border bg-card px-4 py-2 text-sm font-medium transition-colors select-none peer-checked:border-primary/50 peer-checked:bg-primary-soft peer-checked:text-primary-hover peer-focus-visible:border-ring peer-focus-visible:ring-3 peer-focus-visible:ring-ring/50 hover:bg-muted">
-        {checked ? <Check className="size-4" aria-hidden /> : null}
-        {label}
-      </span>
-    </label>
   );
 }
 
