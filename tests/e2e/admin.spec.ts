@@ -177,9 +177,12 @@ test.describe("Espace Super Admin (E-30 à E-33)", () => {
     await page.getByRole("button", { name: "Définir ce mot de passe" }).click();
     await expect(page).toHaveURL(/\/connexion\?motif=mot-de-passe-modifie/);
 
-    // Connexion normale avec 2FA (CH2) → accueil coach (RG-03).
+    // Connexion normale avec 2FA (CH2) → accueil coach (RG-03). Rôle heading :
+    // le route announcer Next peut répéter le h1 (voir note CH2).
     await seConnecter(page, user.inviteEmail, /\/coach$/, MOT_DE_PASSE_COACH_INVITE);
-    await expect(page.getByText(`Bonjour ${user.invitePrenom}`)).toBeVisible();
+    await expect(
+      page.getByRole("heading", { name: `Bonjour ${user.invitePrenom}` }),
+    ).toBeVisible();
   });
 
   test("l'espace admin est inaccessible sans session, aux nageurs et aux coachs (RG-03/RG-40)", async ({
