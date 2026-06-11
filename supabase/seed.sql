@@ -139,6 +139,13 @@ insert into public.llm_providers (id, fournisseur, api_key_encrypted, modele, is
   ('60000000-0000-4000-8000-000000000002', 'openai',    'SEED_FAKE_CIPHERTEXT_OPENAI',    'gpt-4o',            false)
 on conflict (fournisseur) do nothing;
 
+-- CH4 : clés factices enregistrées via Vault (set_llm_api_key remplace le
+-- placeholder par l'id du secret chiffré). Déchiffrables en dev/CI, sans
+-- valeur réelle — la vraie clé s'injecte avec `pnpm llm:set-key` (CH4) puis
+-- via l'UI Super Admin (CH8). Idempotent : rotation du même secret au rejeu.
+select public.set_llm_api_key('anthropic', 'sk-ant-seed-cle-factice');
+select public.set_llm_api_key('openai',    'sk-seed-cle-factice');
+
 -- ---------------------------------------------------------------------------
 -- Journal d'audit (léger, sans données personnelles).
 -- ---------------------------------------------------------------------------
