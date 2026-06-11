@@ -27,5 +27,12 @@ export default defineConfig({
     command: "pnpm dev",
     url: "http://localhost:3000",
     reuseExistingServer: !process.env.CI,
+    env: {
+      ...(process.env as Record<string, string>),
+      // Génération CH5 sans réseau ni clé réelle (C2/D2). Un serveur dev
+      // réutilisé (déjà lancé à la main) doit avoir LLM_DRIVER=simule dans
+      // son .env.local pour que la suite seances passe.
+      LLM_DRIVER: "simule",
+    },
   },
 });

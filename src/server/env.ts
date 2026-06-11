@@ -50,3 +50,18 @@ export function getResendApiKey(): string {
 export function getMailpitUrl(): string {
   return process.env.MAILPIT_URL ?? "http://127.0.0.1:54324";
 }
+
+export type LlmDriver = "fournisseur" | "simule";
+
+/**
+ * "fournisseur" (défaut) appelle le fournisseur LLM actif (RG-38) ;
+ * "simule" produit une séance déterministe sans réseau — dev local sans clé
+ * réelle et tests E2E (D2). Jamais "simule" en production.
+ */
+export function getLlmDriver(): LlmDriver {
+  const driver = process.env.LLM_DRIVER ?? "fournisseur";
+  if (driver !== "fournisseur" && driver !== "simule") {
+    throw new Error(`Unsupported LLM_DRIVER "${driver}" (expected "fournisseur" or "simule").`);
+  }
+  return driver;
+}
