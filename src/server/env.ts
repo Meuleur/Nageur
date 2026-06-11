@@ -51,6 +51,15 @@ export function getMailpitUrl(): string {
   return process.env.MAILPIT_URL ?? "http://127.0.0.1:54324";
 }
 
+/**
+ * URL publique de l'application — liens d'action des e-mails métier (C3).
+ * Valeur par défaut locale : le build CI (sans variables) et le dev passent
+ * sans configuration ; en production, définir APP_URL sur Vercel (D3).
+ */
+export function getAppUrl(): string {
+  return (process.env.APP_URL ?? "http://localhost:3000").replace(/\/$/, "");
+}
+
 export type LlmDriver = "fournisseur" | "simule";
 
 /**
