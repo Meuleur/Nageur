@@ -2,10 +2,12 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { after } from "next/server";
 import { z } from "zod";
 
 import { createSessionClient } from "@/lib/supabase/session";
 import { traiterSeance, TraitementSeanceError } from "@/server/data/validation";
+import { notifierNageurSeanceTraitee } from "@/server/notifications";
 
 import type { ModificationFormState, TraitementFormState } from "./form-state";
 import {
@@ -73,8 +75,10 @@ export async function traiterSeanceAction(
     return { status: "error", message: ERREUR_INATTENDUE };
   }
 
-  // CH7 (RG-37) : point d'appel de la notification e-mail du nageur — la
-  // transition vient d'aboutir (T2 ou T4) ; branchement prévu en CH7.
+  // N5/N7 (RG-37, ADR-020) : nageur notifié hors chemin critique — after()
+  // exécute l'envoi après la réponse ; la transition (T2 ou T4) reste
+  // acquise même si l'e-mail échoue, et la fonction ne rejette jamais.
+  after(() => notifierNageurSeanceTraitee({ seanceId, statut: statutCible }));
 
   redirigerApresTraitement(seanceId, statutCible);
 }
@@ -119,8 +123,10 @@ export async function modifierEtValiderSeanceAction(
     return { status: "error", message: ERREUR_INATTENDUE };
   }
 
-  // CH7 (RG-37) : point d'appel de la notification e-mail du nageur — la
-  // transition vient d'aboutir (T3) ; branchement prévu en CH7.
+  // N6 (RG-37, ADR-020) : nageur notifié hors chemin critique — after()
+  // exécute l'envoi après la réponse ; la transition (T3) reste acquise
+  // même si l'e-mail échoue, et la fonction ne rejette jamais.
+  after(() => notifierNageurSeanceTraitee({ seanceId, statut: "modifiee" }));
 
   redirigerApresTraitement(seanceId, "modifiee");
 }

@@ -2,9 +2,11 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { after } from "next/server";
 
 import { createSessionClient } from "@/lib/supabase/session";
 import { genererSeance, GenerationSeanceError } from "@/server/llm";
+import { notifierCoachSeanceEnAttente } from "@/server/notifications";
 
 import type { GenerationFormState } from "./form-state";
 
@@ -26,8 +28,9 @@ export async function genererSeanceAction(): Promise<GenerationFormState> {
     redirect("/connexion");
   }
 
+  let seanceId: string;
   try {
-    await genererSeance(user.id);
+    ({ seanceId } = await genererSeance(user.id));
   } catch (error) {
     if (error instanceof GenerationSeanceError) {
       // RG-23 : aucune séance créée ; message utilisateur + relance (RG-24).
@@ -45,8 +48,10 @@ export async function genererSeanceAction(): Promise<GenerationFormState> {
     };
   }
 
-  // CH7 (RG-36) : point d'appel de la notification e-mail du coach — la
-  // séance vient d'être créée en_attente (T1) ; branchement prévu en CH7.
+  // N4 (RG-36, ADR-020) : coach notifié hors chemin critique — after()
+  // exécute l'envoi après la réponse ; la séance créée en_attente (T1)
+  // reste acquise même si l'e-mail échoue, et la fonction ne rejette jamais.
+  after(() => notifierCoachSeanceEnAttente(seanceId));
 
   // PN-5 : succès → message « envoyée à votre coach » porté par E-13.
   revalidatePath("/seances");

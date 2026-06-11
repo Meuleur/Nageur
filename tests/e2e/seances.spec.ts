@@ -1,6 +1,7 @@
 import { expect, test, type Page } from "@playwright/test";
 
 import { seConnecter } from "./helpers/login";
+import { latestEmailId, waitForEmail } from "./helpers/mailpit";
 import {
   detailUserFor,
   generationUserFor,
@@ -20,10 +21,11 @@ const succes = (page: Page) => page.locator('[data-slot="alert"][role="status"]'
 const carteSeance = (page: Page) => page.getByRole("link").filter({ hasText: "Séance du" });
 
 test.describe("Parcours nageur — séances (E-12 à E-15)", () => {
-  test("générer une séance : envoyée au coach, visible en attente (E-12, PN-5)", async ({
+  test("générer une séance : envoyée au coach, visible en attente (E-12, PN-5) ; coach notifié (N4, RG-36)", async ({
     page,
   }, testInfo) => {
-    await seConnecter(page, generationUserFor(testInfo));
+    const user = generationUserFor(testInfo);
+    await seConnecter(page, user.email);
 
     // E-10 → E-12 : accès rapide actif (coach affecté).
     await page.getByRole("link", { name: "Générer ma séance" }).click();
@@ -33,6 +35,7 @@ test.describe("Parcours nageur — séances (E-12 à E-15)", () => {
     await expect(page.getByText("votre coach est")).toBeVisible();
     await expect(page.getByText("votre profil est renseigné")).toBeVisible();
 
+    const inboxCoach = await latestEmailId(user.coachEmail);
     await page.getByRole("button", { name: "Générer ma séance" }).click();
 
     // PN-5 : succès → message « envoyée à votre coach » + renvoi vers E-13.
@@ -43,6 +46,15 @@ test.describe("Parcours nageur — séances (E-12 à E-15)", () => {
 
     // RG-21 : la séance créée est en attente, jamais utilisable directement.
     await expect(carteSeance(page).filter({ hasText: "En attente" }).first()).toBeVisible();
+
+    // N4 (RG-36, ADR-020) : le coach affecté reçoit l'e-mail hors chemin
+    // critique, avec l'action vers sa file de relecture — sans identité ni
+    // contenu de séance (C3 : données minimales).
+    const emailCoach = await waitForEmail(user.coachEmail, { afterId: inboxCoach });
+    expect(emailCoach.subject).toBe("Une séance attend votre validation");
+    expect(emailCoach.text).toContain("Un de vos nageurs");
+    expect(emailCoach.html).toMatch(/\/coach\/seances\/[0-9a-f-]+/);
+    expect(emailCoach.text).not.toContain(user.email);
   });
 
   test("séance refusée : commentaire du coach puis régénération immédiate (PN-8, RG-33)", async ({

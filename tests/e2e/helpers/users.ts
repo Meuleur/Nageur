@@ -61,10 +61,17 @@ const SANS_COACH_USERS: Record<string, string> = {
  * auto-évaluations) pour des suites rejouables.
  */
 
-/** Génération nominale (E-12) : profil complet, aucune séance seedée. */
-const GENERATION_USERS: Record<string, string> = {
-  chromium: "ines.nageur@nageur.test",
-  "mobile-chrome": "eva.nageur@nageur.test",
+type GenerationUser = { email: string; coachEmail: string };
+
+/**
+ * Génération nominale (E-12) : profil complet, aucune séance seedée.
+ * coachEmail (Sacha, partagé par les comptes CH5) sert à vérifier N4
+ * (RG-36) dans Mailpit — assertions sans identifiant de séance : les deux
+ * projets Playwright peuvent lui écrire en parallèle.
+ */
+const GENERATION_USERS: Record<string, GenerationUser> = {
+  chromium: { email: "ines.nageur@nageur.test", coachEmail: "sacha.coach@nageur.test" },
+  "mobile-chrome": { email: "eva.nageur@nageur.test", coachEmail: "sacha.coach@nageur.test" },
 };
 
 type RegenerationUser = { email: string; commentaireRefus: string };
@@ -127,24 +134,49 @@ const DETAIL_USERS: Record<string, DetailUser> = {
  * sont remises à zéro par global-setup via reseed_ch6_e2e() (seed.sql).
  */
 
-type CoachValiderUser = { email: string; nageur: string };
+/** nageurEmail : boîte Mailpit du nageur suivi — vérification N5/N6/N7 (RG-37). */
+type CoachValiderUser = { email: string; nageur: string; nageurEmail: string };
 
 /** Tableau de bord + file + valider (E-20/E-21/E-22, T2) + isolation RG-25. */
 const COACH_VALIDER_USERS: Record<string, CoachValiderUser> = {
-  chromium: { email: "remi.coach@nageur.test", nageur: "Anna Faure" },
-  "mobile-chrome": { email: "lucie.coach@nageur.test", nageur: "Élio Brun" },
+  chromium: {
+    email: "remi.coach@nageur.test",
+    nageur: "Anna Faure",
+    nageurEmail: "anna.nageur@nageur.test",
+  },
+  "mobile-chrome": {
+    email: "lucie.coach@nageur.test",
+    nageur: "Élio Brun",
+    nageurEmail: "elio.nageur@nageur.test",
+  },
 };
 
 /** Modifier puis valider (E-23, T3) : une séance en attente à deux séries. */
 const COACH_MODIFIER_USERS: Record<string, CoachValiderUser> = {
-  chromium: { email: "david.coach@nageur.test", nageur: "Maya Robin" },
-  "mobile-chrome": { email: "sara.coach@nageur.test", nageur: "Nino Costa" },
+  chromium: {
+    email: "david.coach@nageur.test",
+    nageur: "Maya Robin",
+    nageurEmail: "maya.nageur@nageur.test",
+  },
+  "mobile-chrome": {
+    email: "sara.coach@nageur.test",
+    nageur: "Nino Costa",
+    nageurEmail: "nino.nageur@nageur.test",
+  },
 };
 
 /** Refuser (E-22, T4, RG-29) : une séance en attente. */
 const COACH_REFUSER_USERS: Record<string, CoachValiderUser> = {
-  chromium: { email: "marc.coach@nageur.test", nageur: "Léon Pages" },
-  "mobile-chrome": { email: "nina.coach@nageur.test", nageur: "Rose Vidal" },
+  chromium: {
+    email: "marc.coach@nageur.test",
+    nageur: "Léon Pages",
+    nageurEmail: "leon.nageur@nageur.test",
+  },
+  "mobile-chrome": {
+    email: "nina.coach@nageur.test",
+    nageur: "Rose Vidal",
+    nageurEmail: "rose.nageur@nageur.test",
+  },
 };
 
 type CoachNageursUser = {
