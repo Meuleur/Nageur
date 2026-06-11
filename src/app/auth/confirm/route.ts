@@ -9,9 +9,10 @@ import { buildResetCookie } from "@/server/auth/cookies";
 const RECOVERY_LINK_TTL_MS = 60 * 60 * 1000;
 
 /**
- * Cible des liens e-mail (gabarits supabase/templates) :
+ * Cible des liens e-mail (gabarits supabase/templates, invitation CH8) :
  *   - type=signup   → vérification d'adresse post-inscription (E-03, RG-05) ;
- *   - type=recovery → ouverture du parcours de réinitialisation (E-04).
+ *   - type=recovery → ouverture du parcours de réinitialisation (E-04) ;
+ *   - type=invite   → activation d'un compte coach invité (E-33, RG-02).
  *
  * Gating C1 : consommer un lien e-mail n'authentifie JAMAIS — le jeton est
  * vérifié via un client sans persistance, la session technique créée par
@@ -23,7 +24,7 @@ export async function GET(request: NextRequest) {
   const type = request.nextUrl.searchParams.get("type");
   const redirectTo = (path: string) => NextResponse.redirect(new URL(path, request.url));
 
-  if (!tokenHash || (type !== "signup" && type !== "recovery")) {
+  if (!tokenHash || (type !== "signup" && type !== "recovery" && type !== "invite")) {
     return redirectTo("/connexion");
   }
 
@@ -43,6 +44,9 @@ export async function GET(request: NextRequest) {
   const bare = createBareAnonClient();
   const { data, error } = await bare.auth.verifyOtp({ type, token_hash: tokenHash });
   if (error || !data.user) {
+    if (type === "invite") {
+      return redirectTo("/connexion?motif=invitation-expiree");
+    }
     return redirectTo(
       type === "signup"
         ? "/verification-email?motif=lien-invalide"
@@ -62,6 +66,17 @@ export async function GET(request: NextRequest) {
     await logAuthEvent("auth.email_verified", { actorId: data.user.id });
     // PN-1 : compte vérifié → redirigé vers la connexion.
     return redirectTo("/connexion?motif=email-verifie");
+  }
+
+  if (type === "invite") {
+    // E-33 : l'invitation confirme l'adresse du coach ; il définit ensuite
+    // son mot de passe par le même parcours sécurisé que la
+    // réinitialisation (cookie signé httpOnly, aucune session — C1).
+    await logAuthEvent("auth.invitation_acceptee", { actorId: data.user.id });
+    const response = redirectTo("/reinitialisation?contexte=invitation");
+    const cookie = buildResetCookie(data.user.id);
+    response.cookies.set(cookie.name, cookie.value, cookie.options);
+    return response;
   }
 
   // type=recovery : preuve de contrôle de l'e-mail acquise — on ouvre une
