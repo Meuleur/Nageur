@@ -35,15 +35,14 @@ export default async function MesNageursPage() {
       <header className="space-y-2">
         <Link
           href="/coach"
-          className="inline-flex items-center gap-1 text-sm text-primary underline-offset-4 hover:underline"
+          className="inline-flex min-h-11 items-center gap-1 text-sm text-primary underline-offset-4 hover:underline"
         >
           <ArrowLeft className="size-4" aria-hidden />
           Retour au tableau de bord
         </Link>
         <h1 className="text-2xl font-semibold sm:text-[28px] sm:leading-9">Mes nageurs</h1>
         <p className="text-caption text-muted-foreground">
-          Les nageurs qui vous sont affectés — profil, historique des séances et
-          auto-évaluations.
+          Les nageurs qui vous sont affectés — profil, historique des séances et auto-évaluations.
         </p>
       </header>
 

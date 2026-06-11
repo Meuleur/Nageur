@@ -24,14 +24,20 @@ export default async function ProfilPage() {
     redirect("/connexion");
   }
 
-  const [{ data: profil }, { data: creneaux }] = await Promise.all([
-    supabase
-      .from("swimmer_profiles")
-      .select("niveau, frequence, duree, bassin, objectifs, materiel")
-      .eq("nageur_id", user.id)
-      .maybeSingle(),
-    supabase.from("swimmer_availabilities").select("jour, moment").eq("nageur_id", user.id),
-  ]);
+  const [{ data: profil, error: erreurProfil }, { data: creneaux, error: erreurCreneaux }] =
+    await Promise.all([
+      supabase
+        .from("swimmer_profiles")
+        .select("niveau, frequence, duree, bassin, objectifs, materiel")
+        .eq("nageur_id", user.id)
+        .maybeSingle(),
+      supabase.from("swimmer_availabilities").select("jour, moment").eq("nageur_id", user.id),
+    ]);
+  if (erreurProfil || erreurCreneaux) {
+    // Sans cela, un échec de lecture présenterait un formulaire vierge que
+    // l'enregistrement écraserait — l'écran d'erreur du groupe prend le relais.
+    throw new Error("profil nageur : lecture impossible");
+  }
 
   const initial: ProfilInitial = {
     niveau: profil?.niveau ?? null,
@@ -48,7 +54,7 @@ export default async function ProfilPage() {
       <header className="space-y-2">
         <Link
           href="/accueil"
-          className="inline-flex items-center gap-1 text-sm text-primary underline-offset-4 hover:underline"
+          className="inline-flex min-h-11 items-center gap-1 text-sm text-primary underline-offset-4 hover:underline"
         >
           <ArrowLeft className="size-4" aria-hidden />
           Retour à l&apos;accueil

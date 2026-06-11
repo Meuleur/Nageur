@@ -1,7 +1,4 @@
-import {
-  buildSeanceGenereeSchema,
-  type SeanceGeneree,
-} from "@/features/seances/schemas";
+import { buildSeanceGenereeSchema, type SeanceGeneree } from "@/features/seances/schemas";
 
 import { GenerationSeanceError } from "./errors";
 import { buildProfilPseudonymise, type ProfilSportifSource } from "./payload";
@@ -88,9 +85,7 @@ export async function genererSeanceAvecDeps(
 
   for (let tentative = 1; tentative <= TENTATIVES_MAX; tentative++) {
     const utilisateur =
-      tentative === 1
-        ? buildPromptUtilisateur(profil)
-        : buildPromptRelance(profil, problemes);
+      tentative === 1 ? buildPromptUtilisateur(profil) : buildPromptRelance(profil, problemes);
 
     let reponse;
     try {
@@ -98,8 +93,7 @@ export async function genererSeanceAvecDeps(
     } catch (error) {
       // Échec fournisseur (RG-23) : aucune séance, pas de relance
       // automatique — le nageur peut relancer lui-même (RG-24).
-      const code =
-        error instanceof GenerationSeanceError ? error.code : "fournisseur_indisponible";
+      const code = error instanceof GenerationSeanceError ? error.code : "fournisseur_indisponible";
       throw await echec(code);
     }
 
@@ -120,8 +114,7 @@ export async function genererSeanceAvecDeps(
         tokens,
       });
     } catch (error) {
-      const code =
-        error instanceof GenerationSeanceError ? error.code : "persistance_echouee";
+      const code = error instanceof GenerationSeanceError ? error.code : "persistance_echouee";
       throw await echec(code);
     }
 
@@ -132,9 +125,7 @@ export async function genererSeanceAvecDeps(
   throw await echec("sortie_invalide");
 }
 
-type Validation =
-  | { ok: true; seance: SeanceGeneree }
-  | { ok: false; problemes: string[] };
+type Validation = { ok: true; seance: SeanceGeneree } | { ok: false; problemes: string[] };
 
 function validerSortie(texte: string, profil: ProfilPseudonymise): Validation {
   let brut: unknown;

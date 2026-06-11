@@ -112,9 +112,7 @@ test.describe("Parcours coach — cycle de validation (E-20 à E-24)", () => {
     await page.locator("#echauffement_distance_m").fill("200");
     await page.locator("#series-0-distance").fill("150");
     await page.getByRole("button", { name: "Ajouter une série" }).click();
-    await page
-      .locator("#series-2-consigne")
-      .fill("Nouvelle série ajoutée par le coach.");
+    await page.locator("#series-2-consigne").fill("Nouvelle série ajoutée par le coach.");
     await page.getByRole("button", { name: "Monter la série 3" }).click();
 
     // Garde Zod client : distance non multiple de 25 m → blocage sur place.

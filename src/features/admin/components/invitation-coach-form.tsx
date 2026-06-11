@@ -49,11 +49,7 @@ export function InvitationCoachForm() {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <form
-          action={formAction}
-          onReset={(event) => event.preventDefault()}
-          className="space-y-4"
-        >
+        <form action={formAction} onReset={(event) => event.preventDefault()} className="space-y-4">
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-2">
               <Label htmlFor="invitation-prenom">Prénom</Label>
@@ -116,7 +112,11 @@ export function InvitationCoachForm() {
           ) : null}
 
           <Button type="submit" disabled={isPending} aria-busy={isPending}>
-            {isPending ? <Loader2 className="animate-spin" aria-hidden /> : <MailPlus aria-hidden />}
+            {isPending ? (
+              <Loader2 className="animate-spin" aria-hidden />
+            ) : (
+              <MailPlus aria-hidden />
+            )}
             Envoyer l&apos;invitation
           </Button>
         </form>

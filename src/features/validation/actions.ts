@@ -26,8 +26,7 @@ import { STATUT_CIBLE_PAR_DECISION } from "./transitions";
  * (RG-25) et le statut en_attente (RG-30) — voir src/server/data/validation.
  */
 
-const ERREUR_INATTENDUE =
-  "Le traitement de la séance a échoué. Réessayez dans quelques instants.";
+const ERREUR_INATTENDUE = "Le traitement de la séance a échoué. Réessayez dans quelques instants.";
 
 /** Succès → retour visuel sur le détail (B2 : confirmation après action). */
 function redirigerApresTraitement(seanceId: string, statut: string): never {

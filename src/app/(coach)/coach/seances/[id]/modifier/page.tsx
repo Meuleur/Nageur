@@ -42,11 +42,7 @@ function SeanceIntrouvable() {
  * retour au détail. Lectures sous RLS (RG-25) ; la transition finale passe
  * par l'action serveur (service role).
  */
-export default async function ModifierSeancePage({
-  params,
-}: {
-  params: Promise<{ id: string }>;
-}) {
+export default async function ModifierSeancePage({ params }: { params: Promise<{ id: string }> }) {
   const supabase = await createSessionClient();
   const {
     data: { user },
@@ -62,7 +58,7 @@ export default async function ModifierSeancePage({
     <main className="mx-auto w-full max-w-3xl flex-1 space-y-6 px-4 py-10 sm:px-6">
       <Link
         href={`/coach/seances/${id}`}
-        className="inline-flex items-center gap-1 text-sm text-primary underline-offset-4 hover:underline"
+        className="inline-flex min-h-11 items-center gap-1 text-sm text-primary underline-offset-4 hover:underline"
       >
         <ArrowLeft className="size-4" aria-hidden />
         Retour à la relecture

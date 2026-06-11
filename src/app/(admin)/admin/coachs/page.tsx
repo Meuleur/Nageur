@@ -28,7 +28,6 @@ export default async function CoachsPage() {
   return (
     <main className="mx-auto w-full max-w-3xl flex-1 space-y-6 px-4 py-10 sm:px-6">
       <AdminEntete
-        actif="/admin/coachs"
         titre="Comptes coachs"
         description="Création par invitation : le coach définit lui-même son mot de passe."
       />

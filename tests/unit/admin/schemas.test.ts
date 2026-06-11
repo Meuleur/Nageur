@@ -18,21 +18,17 @@ describe("schémas admin (E-31 à E-33)", () => {
     });
     expect(ok.cle).toBe("sk-ant-une-cle-suffisamment-longue");
 
-    expect(cleApiSchema.safeParse({ fournisseur: "anthropic", cle: "courte" }).success).toBe(
+    expect(cleApiSchema.safeParse({ fournisseur: "anthropic", cle: "courte" }).success).toBe(false);
+    expect(cleApiSchema.safeParse({ fournisseur: "mistral", cle: "x".repeat(30) }).success).toBe(
       false,
     );
-    expect(
-      cleApiSchema.safeParse({ fournisseur: "mistral", cle: "x".repeat(30) }).success,
-    ).toBe(false);
   });
 
   it("modèle : identifiant simple uniquement (pas d'espace ni de caractère exotique)", () => {
     expect(modeleSchema.parse({ fournisseur: "anthropic", modele: "claude-opus-4-8" }).modele).toBe(
       "claude-opus-4-8",
     );
-    expect(modeleSchema.safeParse({ fournisseur: "openai", modele: "gpt 4o" }).success).toBe(
-      false,
-    );
+    expect(modeleSchema.safeParse({ fournisseur: "openai", modele: "gpt 4o" }).success).toBe(false);
     expect(modeleSchema.safeParse({ fournisseur: "openai", modele: "" }).success).toBe(false);
   });
 

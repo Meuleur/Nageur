@@ -17,7 +17,9 @@ import { readFileSync } from "node:fs";
 
 function chargerEnvLocal() {
   try {
-    for (const ligne of readFileSync(new URL("../.env.local", import.meta.url), "utf8").split("\n")) {
+    for (const ligne of readFileSync(new URL("../.env.local", import.meta.url), "utf8").split(
+      "\n",
+    )) {
       const correspondance = /^\s*([A-Z0-9_]+)\s*=\s*(.*)\s*$/.exec(ligne);
       if (!correspondance) continue;
       const [, nom, brut] = correspondance;

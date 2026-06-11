@@ -237,9 +237,7 @@ describe("formatErreursModification (E-23)", () => {
     if (!resultat.success) {
       const erreurs = formatErreursModification(resultat.error);
       expect(erreurs).toContain("Série 2 : Les distances doivent être des multiples de 25 m.");
-      expect(erreurs).toContain(
-        "Échauffement : Les distances doivent être des multiples de 25 m.",
-      );
+      expect(erreurs).toContain("Échauffement : Les distances doivent être des multiples de 25 m.");
     }
   });
 });

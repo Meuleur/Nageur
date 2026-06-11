@@ -66,7 +66,11 @@ export function GraphiquesAdmin({ metriques }: { metriques: MetriquesAdmin }) {
               .map((s) => `${s.nom} ${s.valeur}`)
               .join(", ")}.`}
           >
-            <ResponsiveContainer width="100%" height="100%">
+            <ResponsiveContainer
+              width="100%"
+              height="100%"
+              initialDimension={{ width: 320, height: 224 }}
+            >
               <BarChart data={statuts} margin={{ top: 8, right: 8, bottom: 0, left: -24 }}>
                 <CartesianGrid stroke={COULEURS.grille} vertical={false} />
                 <XAxis
@@ -109,7 +113,11 @@ export function GraphiquesAdmin({ metriques }: { metriques: MetriquesAdmin }) {
               0,
             )}.`}
           >
-            <ResponsiveContainer width="100%" height="100%">
+            <ResponsiveContainer
+              width="100%"
+              height="100%"
+              initialDimension={{ width: 320, height: 224 }}
+            >
               <LineChart data={serie} margin={{ top: 8, right: 8, bottom: 0, left: -24 }}>
                 <CartesianGrid stroke={COULEURS.grille} vertical={false} />
                 <XAxis

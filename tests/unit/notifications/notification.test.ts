@@ -173,7 +173,10 @@ describe("notifierCoachSeanceEnAttenteAvecDeps — N4 (RG-36)", () => {
       notifierCoachSeanceEnAttenteAvecDeps(lectureEnPanne.deps, SEANCE_ID),
     ).resolves.toBeUndefined();
 
-    const journalEnPanne = fakeDeps({ envois: ["echec", "echec", "echec"], journaliserEchoue: true });
+    const journalEnPanne = fakeDeps({
+      envois: ["echec", "echec", "echec"],
+      journaliserEchoue: true,
+    });
     await expect(
       notifierCoachSeanceEnAttenteAvecDeps(journalEnPanne.deps, SEANCE_ID),
     ).resolves.toBeUndefined();

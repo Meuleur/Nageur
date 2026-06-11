@@ -14,13 +14,8 @@ export const COMMENTAIRE_MAX = 500;
 
 export const autoEvaluationSchema = z.object({
   seanceId: z.uuid("Séance invalide."),
-  ressenti: z
-    .enum(RESSENTI_VALEURS, "Indiquez votre ressenti global (1 à 5).")
-    .transform(Number),
-  difficulte: z
-    .enum(DIFFICULTE_VALEURS, "Difficulté invalide.")
-    .transform(Number)
-    .nullable(),
+  ressenti: z.enum(RESSENTI_VALEURS, "Indiquez votre ressenti global (1 à 5).").transform(Number),
+  difficulte: z.enum(DIFFICULTE_VALEURS, "Difficulté invalide.").transform(Number).nullable(),
   commentaire: z
     .string("Commentaire invalide.")
     .trim()

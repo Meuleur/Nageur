@@ -71,11 +71,7 @@ function LigneProfil({ libelle, valeur }: { libelle: string; valeur: string }) {
  * coach uniquement). Lectures sous RLS (E1) : un nageur non affecté est
  * introuvable (RG-25, RG-43).
  */
-export default async function DetailNageurPage({
-  params,
-}: {
-  params: Promise<{ id: string }>;
-}) {
+export default async function DetailNageurPage({ params }: { params: Promise<{ id: string }> }) {
   const supabase = await createSessionClient();
   const {
     data: { user },
@@ -91,7 +87,7 @@ export default async function DetailNageurPage({
     <main className="mx-auto w-full max-w-3xl flex-1 space-y-6 px-4 py-10 sm:px-6">
       <Link
         href="/coach/nageurs"
-        className="inline-flex items-center gap-1 text-sm text-primary underline-offset-4 hover:underline"
+        className="inline-flex min-h-11 items-center gap-1 text-sm text-primary underline-offset-4 hover:underline"
       >
         <ArrowLeft className="size-4" aria-hidden />
         Retour à mes nageurs
@@ -126,26 +122,29 @@ export default async function DetailNageurPage({
     return entete(<NageurIntrouvable />);
   }
 
-  const [{ data: profilSportif }, { data: disponibilites }, { data: seances, error: erreurSeances }] =
-    await Promise.all([
-      supabase
-        .from("swimmer_profiles")
-        .select("niveau, frequence, duree, bassin, objectifs, materiel")
-        .eq("nageur_id", id)
-        .maybeSingle(),
-      supabase
-        .from("swimmer_availabilities")
-        .select("jour, moment")
-        .eq("nageur_id", id)
-        .order("jour", { ascending: true }),
-      supabase
-        .from("seances")
-        .select(
-          "id, statut, generated_at, distance_totale_m, duree_estimee_min, auto_evaluations(ressenti, difficulte, commentaire)",
-        )
-        .eq("nageur_id", id)
-        .order("generated_at", { ascending: false }),
-    ]);
+  const [
+    { data: profilSportif },
+    { data: disponibilites },
+    { data: seances, error: erreurSeances },
+  ] = await Promise.all([
+    supabase
+      .from("swimmer_profiles")
+      .select("niveau, frequence, duree, bassin, objectifs, materiel")
+      .eq("nageur_id", id)
+      .maybeSingle(),
+    supabase
+      .from("swimmer_availabilities")
+      .select("jour, moment")
+      .eq("nageur_id", id)
+      .order("jour", { ascending: true }),
+    supabase
+      .from("seances")
+      .select(
+        "id, statut, generated_at, distance_totale_m, duree_estimee_min, auto_evaluations(ressenti, difficulte, commentaire)",
+      )
+      .eq("nageur_id", id)
+      .order("generated_at", { ascending: false }),
+  ]);
 
   return entete(
     <>

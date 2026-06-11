@@ -15,7 +15,33 @@ import { AUTH_PAGES, PROTECTED_PREFIXES, ROLE_HOME, type AppRole } from "@/featu
  *     public.profiles avec le client de l'utilisateur (sous RLS).
  * Défense en profondeur : la RLS (E1) reste la barrière de référence sur
  * les données ; les server actions revérifient leurs préconditions.
+ *
+ * Le proxy pose aussi la Content-Security-Policy (C1/E2) : un nonce par
+ * requête (Next l'extrait de l'en-tête de requête et l'applique à ses
+ * scripts), toutes les pages étant rendues dynamiquement.
  */
+function buildContentSecurityPolicy(nonce: string): string {
+  const isDev = process.env.NODE_ENV === "development";
+  return [
+    "default-src 'self'",
+    // strict-dynamic : les scripts porteurs du nonce peuvent en charger
+    // d'autres (chunks Next) ; unsafe-eval requis par React en dev seulement.
+    `script-src 'self' 'nonce-${nonce}' 'strict-dynamic'${isDev ? " 'unsafe-eval'" : ""}`,
+    // unsafe-inline : attributs style posés par React/Framer Motion/Recharts.
+    "style-src 'self' 'unsafe-inline'",
+    "img-src 'self' blob: data:",
+    "font-src 'self'",
+    // Aucun appel navigateur vers Supabase aujourd'hui (écritures côté
+    // serveur, D2) ; ws: en dev pour le rechargement à chaud.
+    `connect-src 'self'${isDev ? " ws:" : ""}`,
+    "object-src 'none'",
+    "base-uri 'self'",
+    "form-action 'self'",
+    "frame-ancestors 'none'",
+    ...(isDev ? [] : ["upgrade-insecure-requests"]),
+  ].join("; ");
+}
+
 export async function proxy(request: NextRequest) {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
@@ -24,6 +50,14 @@ export async function proxy(request: NextRequest) {
       "Missing NEXT_PUBLIC_SUPABASE_URL or NEXT_PUBLIC_SUPABASE_ANON_KEY environment variable (see .env.example).",
     );
   }
+
+  // Mutées avant toute création de réponse : chaque NextResponse.next({
+  // request }) (y compris dans setAll ci-dessous) emporte ces en-têtes, et
+  // Next lit le nonce dans l'en-tête de REQUÊTE au moment du rendu.
+  const nonce = Buffer.from(crypto.randomUUID()).toString("base64");
+  const contentSecurityPolicy = buildContentSecurityPolicy(nonce);
+  request.headers.set("x-nonce", nonce);
+  request.headers.set("content-security-policy", contentSecurityPolicy);
 
   let response = NextResponse.next({ request });
 
@@ -43,6 +77,14 @@ export async function proxy(request: NextRequest) {
       },
     },
   });
+
+  // La CSP doit figurer sur la RÉPONSE rendue (les redirections, sans corps,
+  // n'en ont pas besoin) ; `response` pouvant être recréée par setAll, on la
+  // pose au moment du retour.
+  const withCsp = (res: NextResponse) => {
+    res.headers.set("Content-Security-Policy", contentSecurityPolicy);
+    return res;
+  };
 
   // Toute redirection doit emporter les cookies éventuellement rafraîchis.
   const redirectTo = (path: string) => {
@@ -69,7 +111,7 @@ export async function proxy(request: NextRequest) {
     if (protectedEntry || pathname === "/") {
       return redirectTo("/connexion");
     }
-    return response;
+    return withCsp(response);
   }
 
   const { data: profile } = await supabase
@@ -92,7 +134,7 @@ export async function proxy(request: NextRequest) {
     // RG-03 : un compte n'accède pas aux écrans d'un autre rôle.
     return redirectTo(ROLE_HOME[role]);
   }
-  return response;
+  return withCsp(response);
 }
 
 export const config = {

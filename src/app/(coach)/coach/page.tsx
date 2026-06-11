@@ -6,7 +6,6 @@ import { AlertCircle, ChevronRight, ClipboardCheck, Users } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { LogoutButton } from "@/features/auth/components/logout-button";
 import { StatutBadge } from "@/features/seances/components/statut-badge";
 import { formatDateSeance } from "@/features/seances/labels";
 import type { StatutSeance } from "@/features/seances/statuts";
@@ -64,22 +63,18 @@ export default async function CoachPage() {
 
   return (
     <main className="mx-auto w-full max-w-3xl flex-1 space-y-6 px-4 py-10 sm:px-6">
-      <header className="flex items-center justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-semibold sm:text-[28px] sm:leading-9">
-            Bonjour {profile?.prenom ?? ""}
-          </h1>
-          <p className="text-caption text-muted-foreground">Votre espace coach</p>
-        </div>
-        <LogoutButton />
+      <header>
+        <h1 className="text-2xl font-semibold sm:text-[28px] sm:leading-9">
+          Bonjour {profile?.prenom ?? ""}
+        </h1>
+        <p className="text-caption text-muted-foreground">Votre espace coach</p>
       </header>
 
       {erreurNageurs ? (
         <Alert variant="destructive">
           <AlertCircle aria-hidden />
           <AlertDescription>
-            Impossible de charger votre tableau de bord.{" "}
-            <Link href="/coach">Réessayer</Link>
+            Impossible de charger votre tableau de bord. <Link href="/coach">Réessayer</Link>
           </AlertDescription>
         </Alert>
       ) : (nageurs ?? []).length === 0 ? (
@@ -88,8 +83,8 @@ export default async function CoachPage() {
           <CardHeader>
             <CardTitle>Aucun nageur ne vous est encore affecté</CardTitle>
             <CardDescription>
-              Un administrateur doit vous affecter des nageurs. Vous verrez alors ici leurs
-              séances à valider et leur suivi.
+              Un administrateur doit vous affecter des nageurs. Vous verrez alors ici leurs séances
+              à valider et leur suivi.
             </CardDescription>
           </CardHeader>
         </Card>

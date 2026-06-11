@@ -21,7 +21,6 @@ export default async function FournisseursPage() {
   return (
     <main className="mx-auto w-full max-w-3xl flex-1 space-y-6 px-4 py-10 sm:px-6">
       <AdminEntete
-        actif="/admin/fournisseurs"
         titre="Fournisseurs LLM"
         description="Clés API chiffrées (Vault), modèle et fournisseur actif — un seul à la fois."
       />

@@ -23,10 +23,7 @@ import { COMMENTAIRE_COACH_MAX, COMMENTAIRE_REFUS_REQUIS } from "../schemas";
  * survivent aux allers-retours de l'action serveur (React 19).
  */
 export function TraitementActions({ seanceId }: { seanceId: string }) {
-  const [state, formAction, isPending] = useActionState(
-    traiterSeanceAction,
-    TRAITEMENT_FORM_IDLE,
-  );
+  const [state, formAction, isPending] = useActionState(traiterSeanceAction, TRAITEMENT_FORM_IDLE);
 
   const [commentaire, setCommentaire] = useState("");
   const [erreurClient, setErreurClient] = useState<string | null>(null);
@@ -99,11 +96,7 @@ export function TraitementActions({ seanceId }: { seanceId: string }) {
               disabled={isPending}
               aria-busy={isPending}
             >
-              {isPending ? (
-                <Loader2 className="animate-spin" aria-hidden />
-              ) : (
-                <Check aria-hidden />
-              )}
+              {isPending ? <Loader2 className="animate-spin" aria-hidden /> : <Check aria-hidden />}
               Valider la séance
             </Button>
             <Button asChild variant="outline" disabled={isPending}>

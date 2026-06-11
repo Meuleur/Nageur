@@ -113,13 +113,7 @@ export function OtpForm({ initialExpiresAt }: { initialExpiresAt: number }) {
       </form>
 
       <form action={resendAction} className="text-center">
-        <Button
-          type="submit"
-          variant="ghost"
-          size="sm"
-          disabled={resendWaitSeconds > 0}
-          aria-live="polite"
-        >
+        <Button type="submit" variant="ghost" disabled={resendWaitSeconds > 0} aria-live="polite">
           {resendWaitSeconds > 0
             ? `Renvoyer un code (disponible dans ${resendWaitSeconds} s)`
             : "Renvoyer un code"}

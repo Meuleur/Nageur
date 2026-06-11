@@ -53,7 +53,7 @@ function SelectNage(props: React.ComponentProps<"select">) {
   return (
     <select
       {...props}
-      className="flex h-10 w-full min-w-0 rounded-md border border-input bg-transparent px-3 py-2 text-base transition-[color,box-shadow] outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 md:text-sm"
+      className="flex h-11 w-full min-w-0 rounded-md border border-input bg-transparent px-3 py-2 text-base transition-[color,box-shadow] outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 md:text-sm"
     >
       {TYPES_NAGE.map((type) => (
         <option key={type} value={type}>
@@ -232,10 +232,7 @@ export function ModifierSeanceForm({ seance }: { seance: SeanceAModifier }) {
         </CardHeader>
         <CardContent className="space-y-6">
           {series.map((serie, index) => (
-            <fieldset
-              key={serie.cle}
-              className="space-y-4 rounded-md border border-border p-4"
-            >
+            <fieldset key={serie.cle} className="space-y-4 rounded-md border border-border p-4">
               <legend className="px-1 text-sm font-semibold">Série {index + 1}</legend>
               <div className="grid gap-4 sm:grid-cols-2">
                 <div className="space-y-2">
@@ -247,7 +244,9 @@ export function ModifierSeanceForm({ seance }: { seance: SeanceAModifier }) {
                     inputMode="numeric"
                     min={1}
                     value={serie.repetitions}
-                    onChange={(event) => modifierSerie(serie.cle, "repetitions", event.target.value)}
+                    onChange={(event) =>
+                      modifierSerie(serie.cle, "repetitions", event.target.value)
+                    }
                   />
                 </div>
                 <div className="space-y-2">
@@ -301,7 +300,6 @@ export function ModifierSeanceForm({ seance }: { seance: SeanceAModifier }) {
                 <Button
                   type="button"
                   variant="outline"
-                  size="sm"
                   onClick={() => deplacerSerie(serie.cle, -1)}
                   disabled={index === 0}
                   aria-label={`Monter la série ${index + 1}`}
@@ -312,7 +310,6 @@ export function ModifierSeanceForm({ seance }: { seance: SeanceAModifier }) {
                 <Button
                   type="button"
                   variant="outline"
-                  size="sm"
                   onClick={() => deplacerSerie(serie.cle, 1)}
                   disabled={index === series.length - 1}
                   aria-label={`Descendre la série ${index + 1}`}
@@ -323,7 +320,6 @@ export function ModifierSeanceForm({ seance }: { seance: SeanceAModifier }) {
                 <Button
                   type="button"
                   variant="destructive"
-                  size="sm"
                   onClick={() => supprimerSerie(serie.cle)}
                   disabled={series.length === 1}
                   aria-label={`Supprimer la série ${index + 1}`}
@@ -402,7 +398,11 @@ export function ModifierSeanceForm({ seance }: { seance: SeanceAModifier }) {
         <Alert variant="destructive">
           <AlertCircle aria-hidden />
           <AlertDescription>
-            <p>{erreursClient.length > 0 ? "Séance non modifiée : corrigez les champs signalés." : state.message}</p>
+            <p>
+              {erreursClient.length > 0
+                ? "Séance non modifiée : corrigez les champs signalés."
+                : state.message}
+            </p>
             {erreurs.length > 0 ? (
               <ul className="list-disc pl-5">
                 {erreurs.map((erreur) => (

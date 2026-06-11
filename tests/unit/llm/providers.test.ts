@@ -186,8 +186,8 @@ describe.each(CAS)("fournisseur $nom (SDK officiel, transport simulé)", (cas) =
   });
 
   it("délai dépassé → delai_depasse (ADR-019)", async () => {
-    await expect(
-      cas.creer(options(fetchSuspendu, 100)).generer(REQUETE),
-    ).rejects.toMatchObject({ code: "delai_depasse" });
+    await expect(cas.creer(options(fetchSuspendu, 100)).generer(REQUETE)).rejects.toMatchObject({
+      code: "delai_depasse",
+    });
   });
 });

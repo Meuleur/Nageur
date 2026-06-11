@@ -16,16 +16,12 @@ export const metadata: Metadata = { title: "Affectations — App Natation" };
  */
 export default async function AffectationsPage() {
   await exigerSuperAdmin();
-  const [nageurs, coachs] = await Promise.all([
-    listerNageursPourAffectation(),
-    listerCoachs(),
-  ]);
+  const [nageurs, coachs] = await Promise.all([listerNageursPourAffectation(), listerCoachs()]);
   const sansCoach = nageurs.filter((nageur) => nageur.coachId === null).length;
 
   return (
     <main className="mx-auto w-full max-w-3xl flex-1 space-y-6 px-4 py-10 sm:px-6">
       <AdminEntete
-        actif="/admin/affectations"
         titre="Affectations coach ↔ nageur"
         description={
           sansCoach > 0

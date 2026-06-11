@@ -44,6 +44,9 @@
   /* B4 accent declensions */
   --color-primary-hover: var(--primary-hover);
   --color-primary-soft: var(--primary-soft);
+  /* ADR-026 — surfaces à texte blanc (contraste AA) */
+  --color-primary-strong: var(--primary-strong);
+  --color-primary-strong-hover: var(--primary-strong-hover);
 
   /* B4 session status tokens */
   --color-status-pending: var(--status-pending);
@@ -98,7 +101,8 @@
   --chart-5: var(--primary-hover);
   --sidebar: var(--surface);
   --sidebar-foreground: var(--text);
-  --sidebar-primary: var(--primary);
+  /* ADR-026 : foreground blanc → fond strong. */
+  --sidebar-primary: var(--primary-strong);
   --sidebar-primary-foreground: #ffffff;
   --sidebar-accent: var(--primary-soft);
   --sidebar-accent-foreground: var(--primary-hover);
@@ -115,5 +119,19 @@
   }
   html {
     @apply font-sans;
+  }
+}
+
+/* B4 — prefers-reduced-motion respecté pour les animations/transitions CSS
+   (Framer Motion le gère via MotionConfig reducedMotion="user"). Durée quasi
+   nulle plutôt que `none` : les états finaux des animations restent posés. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
 }

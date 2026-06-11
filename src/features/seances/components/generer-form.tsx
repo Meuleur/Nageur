@@ -18,10 +18,7 @@ import { GENERATION_FORM_IDLE } from "../form-state";
  * elles tombent entre-temps (course), l'erreur renvoie vers E-10/E-11 (B2).
  */
 export function GenererForm() {
-  const [state, formAction, isPending] = useActionState(
-    genererSeanceAction,
-    GENERATION_FORM_IDLE,
-  );
+  const [state, formAction, isPending] = useActionState(genererSeanceAction, GENERATION_FORM_IDLE);
 
   const renvoi =
     state.code === "nageur_sans_coach" ? (

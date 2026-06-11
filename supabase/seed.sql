@@ -551,3 +551,49 @@ $$;
 revoke all on function public.reseed_ch8_e2e() from public, anon, authenticated;
 
 do $$ begin perform public.reseed_ch8_e2e(); end $$;
+
+-- ---------------------------------------------------------------------------
+-- Comptes E2E CH9 (parcours critiques bout-en-bout) — un jeu par PROJET
+-- Playwright (tests/e2e/parcours-critiques.spec.ts) :
+--   * Wanda / Yael (admins)    : affectent le coach au nageur créé par le
+--     test (inscription dynamique e2e-parcours-…@nageur.test) ;
+--   * Ugo / Vera (coachs)      : cibles d'affectation + test d'isolation
+--     coach → espaces nageur/admin (RG-03).
+-- Les nageurs du parcours sont créés par le test lui-même et purgés par
+-- reseed_ch9_e2e() (ci-dessous).
+-- ---------------------------------------------------------------------------
+insert into auth.users
+  (instance_id, id, aud, role, email, encrypted_password, email_confirmed_at,
+   raw_app_meta_data, raw_user_meta_data, created_at, updated_at,
+   confirmation_token, recovery_token, email_change_token_new, email_change)
+values
+  ('00000000-0000-0000-0000-000000000000', '10000000-0000-4000-8000-000000000019', 'authenticated', 'authenticated', 'wanda.admin@nageur.test', extensions.crypt('Password123!', extensions.gen_salt('bf')), now(), '{"provider":"email","providers":["email"]}', '{}', now(), now(), '', '', '', ''),
+  ('00000000-0000-0000-0000-000000000000', '10000000-0000-4000-8000-000000000020', 'authenticated', 'authenticated', 'yael.admin@nageur.test',  extensions.crypt('Password123!', extensions.gen_salt('bf')), now(), '{"provider":"email","providers":["email"]}', '{}', now(), now(), '', '', '', ''),
+  ('00000000-0000-0000-0000-000000000000', '20000000-0000-4000-8000-000000000014', 'authenticated', 'authenticated', 'ugo.coach@nageur.test',   extensions.crypt('Password123!', extensions.gen_salt('bf')), now(), '{"provider":"email","providers":["email"]}', '{}', now(), now(), '', '', '', ''),
+  ('00000000-0000-0000-0000-000000000000', '20000000-0000-4000-8000-000000000015', 'authenticated', 'authenticated', 'vera.coach@nageur.test',  extensions.crypt('Password123!', extensions.gen_salt('bf')), now(), '{"provider":"email","providers":["email"]}', '{}', now(), now(), '', '', '', '')
+on conflict (id) do nothing;
+
+insert into public.profiles (id, role, prenom, nom, email, coach_id) values
+  ('10000000-0000-4000-8000-000000000019', 'super_admin', 'Wanda', 'Admin', 'wanda.admin@nageur.test', null),
+  ('10000000-0000-4000-8000-000000000020', 'super_admin', 'Yael',  'Admin', 'yael.admin@nageur.test',  null),
+  ('20000000-0000-4000-8000-000000000014', 'coach',       'Ugo',   'Vidal', 'ugo.coach@nageur.test',   null),
+  ('20000000-0000-4000-8000-000000000015', 'coach',       'Vera',  'Munoz', 'vera.coach@nageur.test',  null)
+on conflict (id) do nothing;
+
+-- ---------------------------------------------------------------------------
+-- reseed_ch9_e2e — purge les comptes créés dynamiquement par les suites E2E
+-- (inscription CH2 « e2e-… », parcours CH9 « e2e-parcours-… ») pour éviter
+-- l'accumulation entre exécutions ; cascade auth.users → profiles → séances,
+-- disponibilités, auto-évaluations. Appelée par le global-setup Playwright.
+-- ---------------------------------------------------------------------------
+create or replace function public.reseed_ch9_e2e() returns void
+language plpgsql
+as $$
+begin
+  delete from auth.users where email like 'e2e-%@nageur.test';
+end;
+$$;
+
+revoke all on function public.reseed_ch9_e2e() from public, anon, authenticated;
+
+do $$ begin perform public.reseed_ch9_e2e(); end $$;

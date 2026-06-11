@@ -23,11 +23,7 @@ const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12
  * modifiable (ADR-018) — le formulaire est pré-rempli si elle existe.
  * Visible nageur + coach (RG-35, garanti par la RLS).
  */
-export default async function AutoEvaluationPage({
-  params,
-}: {
-  params: Promise<{ id: string }>;
-}) {
+export default async function AutoEvaluationPage({ params }: { params: Promise<{ id: string }> }) {
   const supabase = await createSessionClient();
   const {
     data: { user },
@@ -72,7 +68,7 @@ export default async function AutoEvaluationPage({
       <header className="space-y-2">
         <Link
           href={`/seances/${id}`}
-          className="inline-flex items-center gap-1 text-sm text-primary underline-offset-4 hover:underline"
+          className="inline-flex min-h-11 items-center gap-1 text-sm text-primary underline-offset-4 hover:underline"
         >
           <ArrowLeft className="size-4" aria-hidden />
           Retour à la séance
