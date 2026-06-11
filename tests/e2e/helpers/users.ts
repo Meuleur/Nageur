@@ -120,6 +120,59 @@ const DETAIL_USERS: Record<string, DetailUser> = {
   },
 };
 
+/**
+ * CH6 — parcours coach (E-20 à E-24), un COACH par test ET par projet
+ * Playwright (mêmes contraintes OTP que les nageurs). Chaque coach suit son
+ * propre nageur seedé ; les séances consommées (valider/modifier/refuser)
+ * sont remises à zéro par global-setup via reseed_ch6_e2e() (seed.sql).
+ */
+
+type CoachValiderUser = { email: string; nageur: string };
+
+/** Tableau de bord + file + valider (E-20/E-21/E-22, T2) + isolation RG-25. */
+const COACH_VALIDER_USERS: Record<string, CoachValiderUser> = {
+  chromium: { email: "remi.coach@nageur.test", nageur: "Anna Faure" },
+  "mobile-chrome": { email: "lucie.coach@nageur.test", nageur: "Élio Brun" },
+};
+
+/** Modifier puis valider (E-23, T3) : une séance en attente à deux séries. */
+const COACH_MODIFIER_USERS: Record<string, CoachValiderUser> = {
+  chromium: { email: "david.coach@nageur.test", nageur: "Maya Robin" },
+  "mobile-chrome": { email: "sara.coach@nageur.test", nageur: "Nino Costa" },
+};
+
+/** Refuser (E-22, T4, RG-29) : une séance en attente. */
+const COACH_REFUSER_USERS: Record<string, CoachValiderUser> = {
+  chromium: { email: "marc.coach@nageur.test", nageur: "Léon Pages" },
+  "mobile-chrome": { email: "nina.coach@nageur.test", nageur: "Rose Vidal" },
+};
+
+type CoachNageursUser = {
+  email: string;
+  nageur: string;
+  niveau: string;
+  ressenti: string;
+  autoEvaluation: string;
+};
+
+/** Mes nageurs + historique + auto-évaluations (E-24, RG-35) — lecture seule. */
+const COACH_NAGEURS_USERS: Record<string, CoachNageursUser> = {
+  chromium: {
+    email: "iris.coach@nageur.test",
+    nageur: "Timo Adam",
+    niveau: "Confirmé",
+    ressenti: "4 / 5",
+    autoEvaluation: "Très bonne séance, fin un peu dure.",
+  },
+  "mobile-chrome": {
+    email: "loic.coach@nageur.test",
+    nageur: "Cléo Bodin",
+    niveau: "Intermédiaire",
+    ressenti: "3 / 5",
+    autoEvaluation: "Reprise correcte.",
+  },
+};
+
 function forProject<T>(map: Record<string, T>, testInfo: TestInfo): T {
   const value = map[testInfo.project.name];
   if (!value) {
@@ -138,3 +191,8 @@ export const regenerationUserFor = (testInfo: TestInfo) =>
   forProject(REGENERATION_USERS, testInfo);
 export const listeUserFor = (testInfo: TestInfo) => forProject(LISTE_USERS, testInfo);
 export const detailUserFor = (testInfo: TestInfo) => forProject(DETAIL_USERS, testInfo);
+export const coachValiderFor = (testInfo: TestInfo) => forProject(COACH_VALIDER_USERS, testInfo);
+export const coachModifierFor = (testInfo: TestInfo) =>
+  forProject(COACH_MODIFIER_USERS, testInfo);
+export const coachRefuserFor = (testInfo: TestInfo) => forProject(COACH_REFUSER_USERS, testInfo);
+export const coachNageursFor = (testInfo: TestInfo) => forProject(COACH_NAGEURS_USERS, testInfo);

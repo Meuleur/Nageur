@@ -284,3 +284,190 @@ insert into public.series (id, seance_id, ordre, repetitions, distance_m, type_n
   ('41000000-0000-4000-8000-000000000024', '40000000-0000-4000-8000-000000000017', 1, 5, 100, 'crawl', 35, 'Respiration tous les 3 mouvements.'),
   ('41000000-0000-4000-8000-000000000025', '40000000-0000-4000-8000-000000000017', 2, 4, 50, 'dos', 30, 'Épaules relâchées.')
 on conflict (id) do nothing;
+
+-- ---------------------------------------------------------------------------
+-- CH6 — Comptes et séances E2E (parcours coach, E-20 à E-24).
+-- Un COACH par test ET par projet Playwright (OTP à usage unique + anti-spam
+-- 60 s) ; chaque coach suit son propre nageur pour ne toucher ni aux comptes
+-- CH5 (coach Sacha) ni aux contextes pgTAP de Camille/Alex.
+--   * Rémi / Lucie  : tableau de bord + valider (T2) + isolation inter-coach
+--     — nageur avec une séance en_attente (remise à zéro par reseed_ch6_e2e).
+--   * David / Sara  : modifier puis valider (T3, E-23) — une séance
+--     en_attente à deux séries (remise à zéro par reseed_ch6_e2e).
+--   * Marc / Nina   : refuser (T4, RG-29) — une séance en_attente (remise à
+--     zéro par reseed_ch6_e2e).
+--   * Iris / Loïc   : mes nageurs + historique + auto-évaluations (E-24) —
+--     un nageur avec profil complet et séances validée/modifiée/refusée,
+--     tests en lecture seule.
+-- ---------------------------------------------------------------------------
+insert into auth.users
+  (instance_id, id, aud, role, email, encrypted_password, email_confirmed_at,
+   raw_app_meta_data, raw_user_meta_data, created_at, updated_at,
+   confirmation_token, recovery_token, email_change_token_new, email_change)
+values
+  ('00000000-0000-0000-0000-000000000000', '20000000-0000-4000-8000-000000000004', 'authenticated', 'authenticated', 'remi.coach@nageur.test',  extensions.crypt('Password123!', extensions.gen_salt('bf')), now(), '{"provider":"email","providers":["email"]}', '{}', now(), now(), '', '', '', ''),
+  ('00000000-0000-0000-0000-000000000000', '20000000-0000-4000-8000-000000000005', 'authenticated', 'authenticated', 'lucie.coach@nageur.test', extensions.crypt('Password123!', extensions.gen_salt('bf')), now(), '{"provider":"email","providers":["email"]}', '{}', now(), now(), '', '', '', ''),
+  ('00000000-0000-0000-0000-000000000000', '20000000-0000-4000-8000-000000000006', 'authenticated', 'authenticated', 'david.coach@nageur.test', extensions.crypt('Password123!', extensions.gen_salt('bf')), now(), '{"provider":"email","providers":["email"]}', '{}', now(), now(), '', '', '', ''),
+  ('00000000-0000-0000-0000-000000000000', '20000000-0000-4000-8000-000000000007', 'authenticated', 'authenticated', 'sara.coach@nageur.test',  extensions.crypt('Password123!', extensions.gen_salt('bf')), now(), '{"provider":"email","providers":["email"]}', '{}', now(), now(), '', '', '', ''),
+  ('00000000-0000-0000-0000-000000000000', '20000000-0000-4000-8000-000000000008', 'authenticated', 'authenticated', 'marc.coach@nageur.test',  extensions.crypt('Password123!', extensions.gen_salt('bf')), now(), '{"provider":"email","providers":["email"]}', '{}', now(), now(), '', '', '', ''),
+  ('00000000-0000-0000-0000-000000000000', '20000000-0000-4000-8000-000000000009', 'authenticated', 'authenticated', 'nina.coach@nageur.test',  extensions.crypt('Password123!', extensions.gen_salt('bf')), now(), '{"provider":"email","providers":["email"]}', '{}', now(), now(), '', '', '', ''),
+  ('00000000-0000-0000-0000-000000000000', '20000000-0000-4000-8000-000000000010', 'authenticated', 'authenticated', 'iris.coach@nageur.test',  extensions.crypt('Password123!', extensions.gen_salt('bf')), now(), '{"provider":"email","providers":["email"]}', '{}', now(), now(), '', '', '', ''),
+  ('00000000-0000-0000-0000-000000000000', '20000000-0000-4000-8000-000000000011', 'authenticated', 'authenticated', 'loic.coach@nageur.test',  extensions.crypt('Password123!', extensions.gen_salt('bf')), now(), '{"provider":"email","providers":["email"]}', '{}', now(), now(), '', '', '', ''),
+  ('00000000-0000-0000-0000-000000000000', '30000000-0000-4000-8000-000000000017', 'authenticated', 'authenticated', 'anna.nageur@nageur.test', extensions.crypt('Password123!', extensions.gen_salt('bf')), now(), '{"provider":"email","providers":["email"]}', '{}', now(), now(), '', '', '', ''),
+  ('00000000-0000-0000-0000-000000000000', '30000000-0000-4000-8000-000000000018', 'authenticated', 'authenticated', 'elio.nageur@nageur.test', extensions.crypt('Password123!', extensions.gen_salt('bf')), now(), '{"provider":"email","providers":["email"]}', '{}', now(), now(), '', '', '', ''),
+  ('00000000-0000-0000-0000-000000000000', '30000000-0000-4000-8000-000000000019', 'authenticated', 'authenticated', 'maya.nageur@nageur.test', extensions.crypt('Password123!', extensions.gen_salt('bf')), now(), '{"provider":"email","providers":["email"]}', '{}', now(), now(), '', '', '', ''),
+  ('00000000-0000-0000-0000-000000000000', '30000000-0000-4000-8000-000000000020', 'authenticated', 'authenticated', 'nino.nageur@nageur.test', extensions.crypt('Password123!', extensions.gen_salt('bf')), now(), '{"provider":"email","providers":["email"]}', '{}', now(), now(), '', '', '', ''),
+  ('00000000-0000-0000-0000-000000000000', '30000000-0000-4000-8000-000000000021', 'authenticated', 'authenticated', 'leon.nageur@nageur.test', extensions.crypt('Password123!', extensions.gen_salt('bf')), now(), '{"provider":"email","providers":["email"]}', '{}', now(), now(), '', '', '', ''),
+  ('00000000-0000-0000-0000-000000000000', '30000000-0000-4000-8000-000000000022', 'authenticated', 'authenticated', 'rose.nageur@nageur.test', extensions.crypt('Password123!', extensions.gen_salt('bf')), now(), '{"provider":"email","providers":["email"]}', '{}', now(), now(), '', '', '', ''),
+  ('00000000-0000-0000-0000-000000000000', '30000000-0000-4000-8000-000000000023', 'authenticated', 'authenticated', 'timo.nageur@nageur.test', extensions.crypt('Password123!', extensions.gen_salt('bf')), now(), '{"provider":"email","providers":["email"]}', '{}', now(), now(), '', '', '', ''),
+  ('00000000-0000-0000-0000-000000000000', '30000000-0000-4000-8000-000000000024', 'authenticated', 'authenticated', 'cleo.nageur@nageur.test', extensions.crypt('Password123!', extensions.gen_salt('bf')), now(), '{"provider":"email","providers":["email"]}', '{}', now(), now(), '', '', '', '')
+on conflict (id) do nothing;
+
+insert into public.profiles (id, role, prenom, nom, email, coach_id) values
+  ('20000000-0000-4000-8000-000000000004', 'coach', 'Rémi',  'Caron',  'remi.coach@nageur.test',  null),
+  ('20000000-0000-4000-8000-000000000005', 'coach', 'Lucie', 'Munoz',  'lucie.coach@nageur.test', null),
+  ('20000000-0000-4000-8000-000000000006', 'coach', 'David', 'Lopez',  'david.coach@nageur.test', null),
+  ('20000000-0000-4000-8000-000000000007', 'coach', 'Sara',  'Blanc',  'sara.coach@nageur.test',  null),
+  ('20000000-0000-4000-8000-000000000008', 'coach', 'Marc',  'Henry',  'marc.coach@nageur.test',  null),
+  ('20000000-0000-4000-8000-000000000009', 'coach', 'Nina',  'Joly',   'nina.coach@nageur.test',  null),
+  ('20000000-0000-4000-8000-000000000010', 'coach', 'Iris',  'Morel',  'iris.coach@nageur.test',  null),
+  ('20000000-0000-4000-8000-000000000011', 'coach', 'Loïc',  'Devaux', 'loic.coach@nageur.test',  null)
+on conflict (id) do nothing;
+
+insert into public.profiles (id, role, prenom, nom, email, coach_id) values
+  ('30000000-0000-4000-8000-000000000017', 'nageur', 'Anna', 'Faure', 'anna.nageur@nageur.test', '20000000-0000-4000-8000-000000000004'),
+  ('30000000-0000-4000-8000-000000000018', 'nageur', 'Élio', 'Brun',  'elio.nageur@nageur.test', '20000000-0000-4000-8000-000000000005'),
+  ('30000000-0000-4000-8000-000000000019', 'nageur', 'Maya', 'Robin', 'maya.nageur@nageur.test', '20000000-0000-4000-8000-000000000006'),
+  ('30000000-0000-4000-8000-000000000020', 'nageur', 'Nino', 'Costa', 'nino.nageur@nageur.test', '20000000-0000-4000-8000-000000000007'),
+  ('30000000-0000-4000-8000-000000000021', 'nageur', 'Léon', 'Pages', 'leon.nageur@nageur.test', '20000000-0000-4000-8000-000000000008'),
+  ('30000000-0000-4000-8000-000000000022', 'nageur', 'Rose', 'Vidal', 'rose.nageur@nageur.test', '20000000-0000-4000-8000-000000000009'),
+  ('30000000-0000-4000-8000-000000000023', 'nageur', 'Timo', 'Adam',  'timo.nageur@nageur.test', '20000000-0000-4000-8000-000000000010'),
+  ('30000000-0000-4000-8000-000000000024', 'nageur', 'Cléo', 'Bodin', 'cleo.nageur@nageur.test', '20000000-0000-4000-8000-000000000011')
+on conflict (id) do nothing;
+
+-- Profils sportifs des nageurs consultés en E-24 (Timo / Cléo).
+insert into public.swimmer_profiles (nageur_id, niveau, frequence, duree, bassin, objectifs, materiel) values
+  ('30000000-0000-4000-8000-000000000023', 'confirme',      3, 60, 25, array['technique', 'endurance']::public.objectif[], array['pull_buoy']::public.materiel[]),
+  ('30000000-0000-4000-8000-000000000024', 'intermediaire', 2, 45, 50, array['loisir']::public.objectif[],                  array[]::public.materiel[])
+on conflict (nageur_id) do nothing;
+
+insert into public.swimmer_availabilities (nageur_id, jour, moment) values
+  ('30000000-0000-4000-8000-000000000023', 2, 'soir'),
+  ('30000000-0000-4000-8000-000000000023', 6, 'matin'),
+  ('30000000-0000-4000-8000-000000000024', 3, 'midi')
+on conflict (nageur_id, jour, moment) do nothing;
+
+-- Historique en lecture seule d'Iris/Timo et Loïc/Cléo (E-24) : une séance
+-- par statut terminal + auto-évaluation sur la validée (RG-35).
+insert into public.seances
+  (id, nageur_id, coach_id, statut, echauffement_distance_m, echauffement_consignes,
+   retour_calme_distance_m, retour_calme_consignes, distance_totale_m, duree_estimee_min,
+   commentaire_coach, fournisseur_llm, tokens, generated_at, processed_at)
+values
+  ('40000000-0000-4000-8000-000000000024', '30000000-0000-4000-8000-000000000023', '20000000-0000-4000-8000-000000000010',
+   'validee', 300, 'Crawl progressif.', 200, 'Dos souple.', 1300, 60,
+   'Très bonne base, continue.', 'anthropic', 1100,
+   now() - interval '8 days', now() - interval '7 days'),
+  ('40000000-0000-4000-8000-000000000025', '30000000-0000-4000-8000-000000000023', '20000000-0000-4000-8000-000000000010',
+   'modifiee', 200, 'Échauffement au choix.', 100, 'Relâchement.', 900, 45,
+   'J''ai allégé la séance après ta semaine chargée.', 'openai', 940,
+   now() - interval '5 days', now() - interval '4 days'),
+  ('40000000-0000-4000-8000-000000000026', '30000000-0000-4000-8000-000000000023', '20000000-0000-4000-8000-000000000010',
+   'refusee', 400, 'Quatre nages progressif.', 200, 'Souplesse.', 2200, 75,
+   'Trop intense cette semaine, on repart sur plus léger.', 'anthropic', 1280,
+   now() - interval '2 days', now() - interval '1 day'),
+  ('40000000-0000-4000-8000-000000000027', '30000000-0000-4000-8000-000000000024', '20000000-0000-4000-8000-000000000011',
+   'validee', 200, 'Brasse souple.', 100, 'Nage au choix.', 900, 45,
+   'Bon volume de reprise.', 'anthropic', 920,
+   now() - interval '8 days', now() - interval '7 days'),
+  ('40000000-0000-4000-8000-000000000028', '30000000-0000-4000-8000-000000000024', '20000000-0000-4000-8000-000000000011',
+   'modifiee', 200, 'Crawl très progressif.', 100, 'Relâchement.', 800, 45,
+   'Volume réduit pour la reprise.', 'openai', 900,
+   now() - interval '5 days', now() - interval '4 days'),
+  ('40000000-0000-4000-8000-000000000029', '30000000-0000-4000-8000-000000000024', '20000000-0000-4000-8000-000000000011',
+   'refusee', 300, 'Crawl souple.', 100, 'Dos souple.', 1200, 60,
+   'On revoit d''abord la technique ensemble.', 'anthropic', 1010,
+   now() - interval '2 days', now() - interval '1 day')
+on conflict (id) do nothing;
+
+insert into public.series (id, seance_id, ordre, repetitions, distance_m, type_nage, recuperation_s, consigne) values
+  ('41000000-0000-4000-8000-000000000026', '40000000-0000-4000-8000-000000000024', 1, 8, 100, 'crawl', 30, 'Allure régulière.'),
+  ('41000000-0000-4000-8000-000000000027', '40000000-0000-4000-8000-000000000025', 1, 6, 100, 'dos', 30, 'Souplesse épaules.'),
+  ('41000000-0000-4000-8000-000000000028', '40000000-0000-4000-8000-000000000026', 1, 8, 200, 'quatre_nages', 45, 'Enchaînement complet.'),
+  ('41000000-0000-4000-8000-000000000029', '40000000-0000-4000-8000-000000000027', 1, 6, 100, 'crawl', 35, 'Respiration 3 temps.'),
+  ('41000000-0000-4000-8000-000000000030', '40000000-0000-4000-8000-000000000028', 1, 5, 100, 'crawl', 30, 'Amplitude.'),
+  ('41000000-0000-4000-8000-000000000031', '40000000-0000-4000-8000-000000000029', 1, 8, 100, 'crawl', 30, 'Allure soutenue.')
+on conflict (id) do nothing;
+
+insert into public.auto_evaluations (id, seance_id, nageur_id, ressenti, difficulte, commentaire) values
+  ('50000000-0000-4000-8000-000000000003', '40000000-0000-4000-8000-000000000024', '30000000-0000-4000-8000-000000000023', 4, 6, 'Très bonne séance, fin un peu dure.'),
+  ('50000000-0000-4000-8000-000000000004', '40000000-0000-4000-8000-000000000027', '30000000-0000-4000-8000-000000000024', 3, 5, 'Reprise correcte.')
+on conflict (seance_id) do nothing;
+
+-- ---------------------------------------------------------------------------
+-- reseed_ch6_e2e — remet à zéro les séances CONSOMMÉES par les tests E2E
+-- coach (valider / modifier / refuser) : le trigger seances_statut_terminal
+-- interdit tout retour à en_attente (RG-30), on supprime donc et on
+-- réinsère (les séries suivent par cascade). Outillage de dev/CI uniquement,
+-- appelé par le global-setup Playwright (rôle postgres local) et par le seed
+-- lui-même ; aucun GRANT — jamais exposé aux rôles applicatifs.
+-- ---------------------------------------------------------------------------
+create or replace function public.reseed_ch6_e2e() returns void
+language plpgsql
+security definer
+set search_path = ''
+as $$
+begin
+  delete from public.seances where id in (
+    '40000000-0000-4000-8000-000000000018',
+    '40000000-0000-4000-8000-000000000019',
+    '40000000-0000-4000-8000-000000000020',
+    '40000000-0000-4000-8000-000000000021',
+    '40000000-0000-4000-8000-000000000022',
+    '40000000-0000-4000-8000-000000000023');
+
+  insert into public.seances
+    (id, nageur_id, coach_id, statut, echauffement_distance_m, echauffement_consignes,
+     retour_calme_distance_m, retour_calme_consignes, distance_totale_m, duree_estimee_min,
+     commentaire_coach, fournisseur_llm, tokens, generated_at, processed_at)
+  values
+    -- Anna / Élio : tableau de bord + valider (T2).
+    ('40000000-0000-4000-8000-000000000018', '30000000-0000-4000-8000-000000000017', '20000000-0000-4000-8000-000000000004',
+     'en_attente', 300, 'Crawl progressif, amplitude.', 200, 'Dos très souple.', 1300, 60,
+     null, 'anthropic', 1150, now() - interval '6 hours', null),
+    ('40000000-0000-4000-8000-000000000019', '30000000-0000-4000-8000-000000000018', '20000000-0000-4000-8000-000000000005',
+     'en_attente', 300, 'Nage libre souple.', 200, 'Brasse souple.', 1300, 60,
+     null, 'anthropic', 1170, now() - interval '6 hours', null),
+    -- Maya / Nino : modifier puis valider (T3) — deux séries à éditer.
+    ('40000000-0000-4000-8000-000000000020', '30000000-0000-4000-8000-000000000019', '20000000-0000-4000-8000-000000000006',
+     'en_attente', 300, 'Crawl progressif.', 200, 'Dos souple.', 1200, 60,
+     null, 'anthropic', 1230, now() - interval '5 hours', null),
+    ('40000000-0000-4000-8000-000000000021', '30000000-0000-4000-8000-000000000020', '20000000-0000-4000-8000-000000000007',
+     'en_attente', 300, 'Crawl progressif.', 200, 'Dos souple.', 1200, 60,
+     null, 'anthropic', 1240, now() - interval '5 hours', null),
+    -- Léon / Rose : refuser (T4, commentaire obligatoire RG-29).
+    ('40000000-0000-4000-8000-000000000022', '30000000-0000-4000-8000-000000000021', '20000000-0000-4000-8000-000000000008',
+     'en_attente', 400, 'Quatre nages progressif.', 200, 'Souplesse.', 2200, 75,
+     null, 'anthropic', 1300, now() - interval '4 hours', null),
+    ('40000000-0000-4000-8000-000000000023', '30000000-0000-4000-8000-000000000022', '20000000-0000-4000-8000-000000000009',
+     'en_attente', 400, 'Quatre nages progressif.', 200, 'Souplesse.', 2200, 75,
+     null, 'anthropic', 1310, now() - interval '4 hours', null);
+
+  insert into public.series (id, seance_id, ordre, repetitions, distance_m, type_nage, recuperation_s, consigne) values
+    ('41000000-0000-4000-8000-000000000032', '40000000-0000-4000-8000-000000000018', 1, 8, 100, 'crawl', 30, 'Allure régulière.'),
+    ('41000000-0000-4000-8000-000000000033', '40000000-0000-4000-8000-000000000019', 1, 8, 100, 'crawl', 30, 'Respiration 3 temps.'),
+    ('41000000-0000-4000-8000-000000000034', '40000000-0000-4000-8000-000000000020', 1, 4, 100, 'crawl', 30, 'Allure régulière.'),
+    ('41000000-0000-4000-8000-000000000035', '40000000-0000-4000-8000-000000000020', 2, 6, 50, 'dos', 20, 'Souplesse épaules.'),
+    ('41000000-0000-4000-8000-000000000036', '40000000-0000-4000-8000-000000000021', 1, 4, 100, 'crawl', 30, 'Allure régulière.'),
+    ('41000000-0000-4000-8000-000000000037', '40000000-0000-4000-8000-000000000021', 2, 6, 50, 'dos', 20, 'Souplesse épaules.'),
+    ('41000000-0000-4000-8000-000000000038', '40000000-0000-4000-8000-000000000022', 1, 8, 200, 'quatre_nages', 45, 'Enchaînement complet.'),
+    ('41000000-0000-4000-8000-000000000039', '40000000-0000-4000-8000-000000000023', 1, 8, 200, 'quatre_nages', 45, 'Enchaînement complet.');
+end;
+$$;
+
+revoke all on function public.reseed_ch6_e2e() from public, anon, authenticated;
+
+-- Bloc DO : le CLI Supabase parse tout le seed en un lot AVANT exécution —
+-- un `select reseed_ch6_e2e()` nu échouerait (fonction créée dans ce même
+-- lot) ; le corps d'un DO n'est résolu qu'à l'exécution.
+do $$ begin perform public.reseed_ch6_e2e(); end $$;

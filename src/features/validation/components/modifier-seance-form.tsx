@@ -107,10 +107,14 @@ export function ModifierSeanceForm({ seance }: { seance: SeanceAModifier }) {
   const [erreursClient, setErreursClient] = useState<string[]>([]);
 
   const ajouterSerie = () => {
+    // Clé réservée HORS de l'updater : React (StrictMode) peut le rejouer,
+    // il doit rester pur.
+    const cle = prochaineCle.current;
+    prochaineCle.current += 1;
     setSeries((actuelles) => [
       ...actuelles,
       {
-        cle: prochaineCle.current++,
+        cle,
         repetitions: "1",
         distance: "50",
         typeNage: TYPES_NAGE[0],

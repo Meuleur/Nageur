@@ -4,12 +4,17 @@ import { extractOtpCode, latestEmailId, waitForEmail } from "./mailpit";
 import { SEED_PASSWORD } from "./users";
 
 /**
- * Connexion complète (mot de passe + OTP e-mail, PN-2) — parcours nominal
- * partagé par les suites postérieures à CH2. Rappel : un seul code OTP actif
- * et 60 s entre deux envois par compte → chaque test qui se connecte doit
- * utiliser SON compte seedé (voir users.ts).
+ * Connexion complète (mot de passe + OTP e-mail, PN-2/PC-1) — parcours
+ * nominal partagé par les suites postérieures à CH2. Rappel : un seul code
+ * OTP actif et 60 s entre deux envois par compte → chaque test qui se
+ * connecte doit utiliser SON compte seedé (voir users.ts). L'accueil dépend
+ * du rôle (RG-03) : /accueil (nageur) par défaut, /coach pour un coach.
  */
-export async function seConnecter(page: Page, email: string): Promise<void> {
+export async function seConnecter(
+  page: Page,
+  email: string,
+  accueil: RegExp = /\/accueil/,
+): Promise<void> {
   const inboxBefore = await latestEmailId(email);
 
   await page.goto("/connexion");
@@ -21,5 +26,5 @@ export async function seConnecter(page: Page, email: string): Promise<void> {
   const otpEmail = await waitForEmail(email, { afterId: inboxBefore });
   await page.getByLabel("Code reçu par e-mail").fill(extractOtpCode(otpEmail));
   await page.getByRole("button", { name: "Valider" }).click();
-  await expect(page).toHaveURL(/\/accueil/);
+  await expect(page).toHaveURL(accueil);
 }
