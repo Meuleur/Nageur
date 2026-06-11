@@ -24,6 +24,15 @@ test.describe("Profil nageur (E-11) & accueil (E-10)", () => {
     await expect(page.getByText(`Votre coach : ${user.coach}`)).toBeVisible();
     await expect(page.locator("body")).not.toContainText(user.coachEmail);
 
+    // CH5 — E-12 : profil non renseigné → précondition RG-17 bloquante,
+    // renvoi vers E-11 (B2).
+    await page.goto("/seances/generer");
+    await expect(page.getByText("votre profil n'est pas encore renseigné")).toBeVisible();
+    await expect(page.getByRole("button", { name: "Générer ma séance" })).toBeDisabled();
+    await page.getByRole("link", { name: "Compléter mon profil" }).click();
+    await expect(page).toHaveURL(/\/profil/);
+    await page.goto("/accueil");
+
     // Accès rapide vers le profil (profil vierge → « Renseigner »).
     await page.getByRole("link", { name: "Renseigner mon profil" }).click();
     await expect(page).toHaveURL(/\/profil/);
@@ -101,6 +110,12 @@ test.describe("Profil nageur (E-11) & accueil (E-10)", () => {
     // RG-14 / ADR-014 : écran « sans coach », génération indisponible.
     await expect(page.getByText("Vous n'avez pas encore de coach")).toBeVisible();
     await expect(page.getByRole("button", { name: "Générer ma séance" })).toBeDisabled();
+
+    // CH5 — E-12 : précondition coach manquante (RG-14), renvoi E-10 (B2).
+    await page.goto("/seances/generer");
+    await expect(page.getByText("vous n'avez pas encore de coach")).toBeVisible();
+    await expect(page.getByRole("button", { name: "Générer ma séance" })).toBeDisabled();
+    await page.goto("/accueil");
 
     // PN-3 : le profil reste accessible et modifiable.
     await page.getByRole("link", { name: "Renseigner mon profil" }).click();

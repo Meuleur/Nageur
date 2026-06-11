@@ -54,6 +54,72 @@ const SANS_COACH_USERS: Record<string, string> = {
   "mobile-chrome": "theo.nageur@nageur.test",
 };
 
+/**
+ * CH5 — parcours séances (E-12 à E-15), comptes dédiés par test (coach :
+ * Sacha Royer). Les séances seedées portent des UUID fixes (seed.sql) ;
+ * global-setup purge ce que les tests créent (séances générées,
+ * auto-évaluations) pour des suites rejouables.
+ */
+
+/** Génération nominale (E-12) : profil complet, aucune séance seedée. */
+const GENERATION_USERS: Record<string, string> = {
+  chromium: "ines.nageur@nageur.test",
+  "mobile-chrome": "eva.nageur@nageur.test",
+};
+
+type RegenerationUser = { email: string; commentaireRefus: string };
+
+/** Refus → régénération (PN-8, RG-33) : une séance refusée seedée. */
+const REGENERATION_USERS: Record<string, RegenerationUser> = {
+  chromium: {
+    email: "mael.nageur@nageur.test",
+    commentaireRefus: "Trop de volume cette semaine, on repart sur plus léger.",
+  },
+  "mobile-chrome": {
+    email: "yanis.nageur@nageur.test",
+    commentaireRefus: "On revoit la technique avant d'enchaîner ce type de séance.",
+  },
+};
+
+type ListeUser = { email: string; seanceEnAttenteId: string; consigneSerieEnAttente: string };
+
+/** Liste + filtre + en attente non utilisable (E-13) : les 4 statuts seedés. */
+const LISTE_USERS: Record<string, ListeUser> = {
+  chromium: {
+    email: "jade.nageur@nageur.test",
+    seanceEnAttenteId: "40000000-0000-4000-8000-000000000008",
+    consigneSerieEnAttente: "Respiration 3 temps.",
+  },
+  "mobile-chrome": {
+    email: "lina.nageur@nageur.test",
+    seanceEnAttenteId: "40000000-0000-4000-8000-000000000012",
+    consigneSerieEnAttente: "Allure régulière.",
+  },
+};
+
+type DetailUser = {
+  email: string;
+  commentaireCoach: string;
+  serie: string;
+  distanceTotale: RegExp;
+};
+
+/** Détail utilisable + auto-évaluation (E-14/E-15) : une séance validée seedée. */
+const DETAIL_USERS: Record<string, DetailUser> = {
+  chromium: {
+    email: "louis.nageur@nageur.test",
+    commentaireCoach: "Belle séance, garde le rythme sur les cent mètres.",
+    serie: "6 × 100 m — Crawl",
+    distanceTotale: /1\s*400 m/,
+  },
+  "mobile-chrome": {
+    email: "hugo.nageur@nageur.test",
+    commentaireCoach: "Bon volume pour reprendre en douceur.",
+    serie: "5 × 100 m — Crawl",
+    distanceTotale: /1\s*000 m/,
+  },
+};
+
 function forProject<T>(map: Record<string, T>, testInfo: TestInfo): T {
   const value = map[testInfo.project.name];
   if (!value) {
@@ -67,3 +133,8 @@ export const resetUserFor = (testInfo: TestInfo) => forProject(RESET_USERS, test
 export const lockoutUserFor = (testInfo: TestInfo) => forProject(LOCKOUT_USERS, testInfo);
 export const profilUserFor = (testInfo: TestInfo) => forProject(PROFIL_USERS, testInfo);
 export const sansCoachUserFor = (testInfo: TestInfo) => forProject(SANS_COACH_USERS, testInfo);
+export const generationUserFor = (testInfo: TestInfo) => forProject(GENERATION_USERS, testInfo);
+export const regenerationUserFor = (testInfo: TestInfo) =>
+  forProject(REGENERATION_USERS, testInfo);
+export const listeUserFor = (testInfo: TestInfo) => forProject(LISTE_USERS, testInfo);
+export const detailUserFor = (testInfo: TestInfo) => forProject(DETAIL_USERS, testInfo);

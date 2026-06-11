@@ -12,12 +12,24 @@ import { execSync } from "node:child_process";
 const PROFIL_E2E_EMAILS =
   "('mia.nageur@nageur.test','zoe.nageur@nageur.test','tom.nageur@nageur.test','theo.nageur@nageur.test')";
 
+/** Comptes CH5 « génération » : aucune séance seedée — tout est généré par les tests. */
+const GENERATION_E2E_EMAILS = "('ines.nageur@nageur.test','eva.nageur@nageur.test')";
+
+/** Comptes CH5 « refus → régénération » : on ne garde que la séance refusée seedée. */
+const REGENERATION_E2E_EMAILS = "('mael.nageur@nageur.test','yanis.nageur@nageur.test')";
+
+/** Comptes CH5 « détail + auto-évaluation » : auto-évaluation recréée par les tests. */
+const DETAIL_E2E_EMAILS = "('louis.nageur@nageur.test','hugo.nageur@nageur.test')";
+
 const SQL = [
   "truncate public.auth_rate_limits;",
   "update public.otp_codes set used = true where not used;",
   "update auth.users set recovery_sent_at = null where email like '%@nageur.test';",
   `delete from public.swimmer_availabilities where nageur_id in (select id from public.profiles where email in ${PROFIL_E2E_EMAILS});`,
   `delete from public.swimmer_profiles where nageur_id in (select id from public.profiles where email in ${PROFIL_E2E_EMAILS});`,
+  `delete from public.seances where nageur_id in (select id from public.profiles where email in ${GENERATION_E2E_EMAILS});`,
+  `delete from public.seances where statut = 'en_attente' and nageur_id in (select id from public.profiles where email in ${REGENERATION_E2E_EMAILS});`,
+  `delete from public.auto_evaluations where nageur_id in (select id from public.profiles where email in ${DETAIL_E2E_EMAILS});`,
 ].join(" ");
 
 export default function globalSetup() {
