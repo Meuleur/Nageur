@@ -69,10 +69,7 @@ export async function listerFournisseursLlm(): Promise<FournisseurLlmAdmin[]> {
   }));
 }
 
-export async function definirCleApiLlm(
-  fournisseur: FournisseurAdmin,
-  cle: string,
-): Promise<void> {
+export async function definirCleApiLlm(fournisseur: FournisseurAdmin, cle: string): Promise<void> {
   const supabase = createServiceRoleClient();
   const { error } = await supabase.rpc("set_llm_api_key", {
     p_fournisseur: fournisseur,
@@ -271,7 +268,12 @@ export async function creerCoachInvite(invitation: {
     return { ok: false, code: "echec" };
   }
 
-  return { ok: true, coachId: cree.user.id, tokenHash: lien.properties.hashed_token, relance: false };
+  return {
+    ok: true,
+    coachId: cree.user.id,
+    tokenHash: lien.properties.hashed_token,
+    relance: false,
+  };
 }
 
 /**

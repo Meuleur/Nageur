@@ -34,13 +34,7 @@ const SERIE = {
 export const SCHEMA_JSON_SEANCE: Record<string, unknown> = {
   type: "object",
   additionalProperties: false,
-  required: [
-    "echauffement",
-    "corps",
-    "retour_au_calme",
-    "distance_totale_m",
-    "duree_estimee_min",
-  ],
+  required: ["echauffement", "corps", "retour_au_calme", "distance_totale_m", "duree_estimee_min"],
   properties: {
     echauffement: BLOC,
     corps: { type: "array", items: SERIE },

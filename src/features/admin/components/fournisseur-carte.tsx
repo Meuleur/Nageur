@@ -126,7 +126,11 @@ export function FournisseurCarte({
               aria-describedby={erreurCle ? `cle-${fournisseur}-erreur` : undefined}
             />
             <Button type="submit" disabled={cleEnCours || cle.trim() === ""} aria-busy={cleEnCours}>
-              {cleEnCours ? <Loader2 className="animate-spin" aria-hidden /> : <KeyRound aria-hidden />}
+              {cleEnCours ? (
+                <Loader2 className="animate-spin" aria-hidden />
+              ) : (
+                <KeyRound aria-hidden />
+              )}
               Enregistrer
             </Button>
           </div>
@@ -164,19 +168,27 @@ export function FournisseurCarte({
                 <option key={suggestion} value={suggestion} />
               ))}
             </datalist>
-            <Button type="submit" variant="outline" disabled={modeleEnCours} aria-busy={modeleEnCours}>
+            <Button
+              type="submit"
+              variant="outline"
+              disabled={modeleEnCours}
+              aria-busy={modeleEnCours}
+            >
               {modeleEnCours ? <Loader2 className="animate-spin" aria-hidden /> : null}
               Enregistrer le modèle
             </Button>
           </div>
           {fournisseur === "anthropic" ? (
             <p className="text-caption text-muted-foreground">
-              Les modèles Opus 4.7+ et Fable n&apos;acceptent pas de température : l&apos;application
-              l&apos;omet automatiquement pour eux (ADR-025).
+              Les modèles Opus 4.7+ et Fable n&apos;acceptent pas de température :
+              l&apos;application l&apos;omet automatiquement pour eux (ADR-025).
             </p>
           ) : null}
           {erreurModele ? (
-            <p id={`modele-${fournisseur}-erreur`} className="text-caption text-status-refused-text">
+            <p
+              id={`modele-${fournisseur}-erreur`}
+              className="text-caption text-status-refused-text"
+            >
               {erreurModele}
             </p>
           ) : null}
@@ -188,7 +200,12 @@ export function FournisseurCarte({
           <div className="flex flex-col gap-2 sm:flex-row">
             <form action={soumettreTest}>
               <input type="hidden" name="fournisseur" value={fournisseur} />
-              <Button type="submit" variant="outline" disabled={testEnCours} aria-busy={testEnCours}>
+              <Button
+                type="submit"
+                variant="outline"
+                disabled={testEnCours}
+                aria-busy={testEnCours}
+              >
                 {testEnCours ? (
                   <Loader2 className="animate-spin" aria-hidden />
                 ) : (

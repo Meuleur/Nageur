@@ -5,13 +5,13 @@ sont livrés par CH2). Tout part du serveur via le service e-mail commun
 (`src/server/email`, pilote `EMAIL_DRIVER` : Resend en production, Mailpit en
 dev/E2E — aucun envoi réseau réel en CI).
 
-| # | Événement (A3) | Destinataire | Point d'appel |
-|---|---|---|---|
-| N4 | Séance créée `en_attente` (T1) | Coach affecté (RG-36) | `genererSeanceAction` (CH5) |
-| N5 | Séance validée (T2) | Nageur (RG-37) | `traiterSeanceAction` (CH6) |
-| N6 | Séance modifiée puis validée (T3) | Nageur (RG-37) | `modifierEtValiderSeanceAction` (CH6) |
-| N7 | Séance refusée (T4) — commentaire inclus | Nageur (RG-37) | `traiterSeanceAction` (CH6) |
-| N8 | Coach affecté au nageur (PA-4) | Nageur | **À brancher en CH8** (voir ci-dessous) |
+| #   | Événement (A3)                           | Destinataire          | Point d'appel                           |
+| --- | ---------------------------------------- | --------------------- | --------------------------------------- |
+| N4  | Séance créée `en_attente` (T1)           | Coach affecté (RG-36) | `genererSeanceAction` (CH5)             |
+| N5  | Séance validée (T2)                      | Nageur (RG-37)        | `traiterSeanceAction` (CH6)             |
+| N6  | Séance modifiée puis validée (T3)        | Nageur (RG-37)        | `modifierEtValiderSeanceAction` (CH6)   |
+| N7  | Séance refusée (T4) — commentaire inclus | Nageur (RG-37)        | `traiterSeanceAction` (CH6)             |
+| N8  | Coach affecté au nageur (PA-4)           | Nageur                | **À brancher en CH8** (voir ci-dessous) |
 
 ## Architecture
 

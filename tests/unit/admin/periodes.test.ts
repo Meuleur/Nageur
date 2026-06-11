@@ -6,15 +6,11 @@ const MAINTENANT = new Date("2026-06-11T12:00:00.000Z");
 
 describe("périodes du tableau de bord (E-30, C4)", () => {
   it("fenêtres glissantes : jour = 24 h, semaine = 7 j, mois = 30 j", () => {
-    expect(depuisPourPeriode("jour", MAINTENANT)?.toISOString()).toBe(
-      "2026-06-10T12:00:00.000Z",
-    );
+    expect(depuisPourPeriode("jour", MAINTENANT)?.toISOString()).toBe("2026-06-10T12:00:00.000Z");
     expect(depuisPourPeriode("semaine", MAINTENANT)?.toISOString()).toBe(
       "2026-06-04T12:00:00.000Z",
     );
-    expect(depuisPourPeriode("mois", MAINTENANT)?.toISOString()).toBe(
-      "2026-05-12T12:00:00.000Z",
-    );
+    expect(depuisPourPeriode("mois", MAINTENANT)?.toISOString()).toBe("2026-05-12T12:00:00.000Z");
   });
 
   it("total : aucune borne (null)", () => {
