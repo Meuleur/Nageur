@@ -55,7 +55,6 @@ export default async function AdminPage({
   return (
     <main className="mx-auto w-full max-w-5xl flex-1 space-y-6 px-4 py-10 sm:px-6">
       <AdminEntete
-        actif="/admin"
         titre="Tableau de bord"
         description="Métriques agrégées de l'application — aucune donnée de contenu."
       />

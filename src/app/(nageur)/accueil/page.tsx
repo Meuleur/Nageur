@@ -5,7 +5,6 @@ import { ClipboardList, ListChecks, Sparkles, UserRound } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { LogoutButton } from "@/features/auth/components/logout-button";
 import { createSessionClient } from "@/lib/supabase/session";
 
 export const metadata: Metadata = { title: "Accueil — App Natation" };
@@ -36,14 +35,11 @@ export default async function AccueilPage() {
 
   return (
     <main className="mx-auto w-full max-w-3xl flex-1 space-y-6 px-4 py-10 sm:px-6">
-      <header className="flex items-center justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-semibold sm:text-[28px] sm:leading-9">
-            Bonjour {profile?.prenom ?? ""}
-          </h1>
-          <p className="text-caption text-muted-foreground">Votre espace nageur</p>
-        </div>
-        <LogoutButton />
+      <header>
+        <h1 className="text-2xl font-semibold sm:text-[28px] sm:leading-9">
+          Bonjour {profile?.prenom ?? ""}
+        </h1>
+        <p className="text-caption text-muted-foreground">Votre espace nageur</p>
       </header>
 
       {coach ? (

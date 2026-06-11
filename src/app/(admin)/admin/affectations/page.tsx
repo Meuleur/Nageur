@@ -25,7 +25,6 @@ export default async function AffectationsPage() {
   return (
     <main className="mx-auto w-full max-w-3xl flex-1 space-y-6 px-4 py-10 sm:px-6">
       <AdminEntete
-        actif="/admin/affectations"
         titre="Affectations coach ↔ nageur"
         description={
           sansCoach > 0
