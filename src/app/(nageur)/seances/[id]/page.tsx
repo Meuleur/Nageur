@@ -88,9 +88,7 @@ export default async function DetailSeancePage({
   const { data: seance, error } = await supabase
     .from("seances")
     .select(
-      "id, statut, generated_at, echauffement_distance_m, echauffement_consignes, " +
-        "retour_calme_distance_m, retour_calme_consignes, distance_totale_m, " +
-        "duree_estimee_min, commentaire_coach",
+      "id, statut, generated_at, echauffement_distance_m, echauffement_consignes, retour_calme_distance_m, retour_calme_consignes, distance_totale_m, duree_estimee_min, commentaire_coach",
     )
     .eq("id", id)
     .maybeSingle();

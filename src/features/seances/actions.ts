@@ -14,10 +14,9 @@ import type { GenerationFormState } from "./form-state";
  * — préconditions (RG-14/RG-17), appel fournisseur, validation et écriture
  * de la séance restent côté serveur (service role, RG-21).
  */
-export async function genererSeanceAction(
-  _prev: GenerationFormState,
-  _formData: FormData,
-): Promise<GenerationFormState> {
+// Signature réduite : useActionState fournit (état précédent, FormData),
+// inutiles ici — le nageur connecté est la seule entrée (RG-19).
+export async function genererSeanceAction(): Promise<GenerationFormState> {
   const supabase = await createSessionClient();
   const {
     data: { user },
