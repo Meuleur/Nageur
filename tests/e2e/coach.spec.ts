@@ -1,12 +1,22 @@
 import { expect, test, type Page } from "@playwright/test";
 
 import { seConnecter } from "./helpers/login";
+import { latestEmailId, waitForEmail } from "./helpers/mailpit";
 import {
   coachModifierFor,
   coachNageursFor,
   coachRefuserFor,
   coachValiderFor,
 } from "./helpers/users";
+
+/** Identifiant de la séance affichée — les e-mails N5/N6 pointent dessus. */
+function seanceIdDepuisUrl(url: string): string {
+  const match = url.match(/\/coach\/seances\/([0-9a-f-]+)/);
+  if (!match) {
+    throw new Error(`Pas d'identifiant de séance dans l'URL « ${url} ».`);
+  }
+  return match[1];
+}
 
 /**
  * CH6 — cycle de validation coach (E-20 à E-24, PC-2 à PC-5).
@@ -52,11 +62,18 @@ test.describe("Parcours coach — cycle de validation (E-20 à E-24)", () => {
     await expect(page.getByRole("button", { name: "Refuser" })).toBeVisible();
 
     // T2 : valider → retour visuel + badge Validée + actions retirées (A3).
+    const inboxNageur = await latestEmailId(user.nageurEmail);
     await page.getByRole("button", { name: "Valider la séance" }).click();
     await expect(page).toHaveURL(/traitement=validee/, { timeout: 20_000 });
     await expect(succes(page)).toContainText("La séance a été validée");
     await expect(badgeStatut(page)).toHaveText("Validée");
     await expect(page.getByRole("button", { name: "Valider la séance" })).toHaveCount(0);
+
+    // N5 (RG-37, ADR-020) : le nageur est notifié hors chemin critique,
+    // avec l'action vers SA séance désormais disponible.
+    const emailValidee = await waitForEmail(user.nageurEmail, { afterId: inboxNageur });
+    expect(emailValidee.subject).toBe("Votre séance est disponible");
+    expect(emailValidee.html).toContain(`/seances/${seanceIdDepuisUrl(page.url())}`);
 
     // E-21 : la file est désormais vide.
     await page.goto("/coach/seances");
@@ -111,6 +128,7 @@ test.describe("Parcours coach — cycle de validation (E-20 à E-24)", () => {
     // Correction puis validation : distance totale recalculée en direct.
     await page.locator("#series-0-distance").fill("150");
     await expect(page.getByText(/Distance totale recalculée/)).toContainText(/1\s*350 m/);
+    const inboxNageur = await latestEmailId(user.nageurEmail);
     await page.getByRole("button", { name: "Valider", exact: true }).click();
 
     // T3 : statut Modifiée + contenu mis à jour dans l'ordre choisi (RG-28).
@@ -118,6 +136,13 @@ test.describe("Parcours coach — cycle de validation (E-20 à E-24)", () => {
     await expect(succes(page)).toContainText("La séance a été modifiée et validée");
     await expect(badgeStatut(page)).toHaveText("Modifiée par le coach");
     await expect(page.getByText(/1\s*350 m/).first()).toBeVisible();
+
+    // N6 (RG-37) : message distinct de N5 — la séance ajustée est disponible,
+    // sans le contenu de la séance dans l'e-mail (C3 : données minimales).
+    const emailModifiee = await waitForEmail(user.nageurEmail, { afterId: inboxNageur });
+    expect(emailModifiee.subject).toBe("Votre séance ajustée est disponible");
+    expect(emailModifiee.html).toContain(`/seances/${seanceIdDepuisUrl(page.url())}`);
+    expect(emailModifiee.text).not.toContain("Nouvelle série ajoutée par le coach.");
 
     const series = page.locator("ol > li");
     await expect(series).toHaveCount(3);
@@ -149,6 +174,7 @@ test.describe("Parcours coach — cycle de validation (E-20 à E-24)", () => {
     await page
       .getByLabel(/Commentaire pour le nageur/)
       .fill("Séance trop intense pour cette semaine, on allège.");
+    const inboxNageur = await latestEmailId(user.nageurEmail);
     await page.getByRole("button", { name: "Refuser" }).click();
     await expect(page).toHaveURL(/traitement=refusee/, { timeout: 20_000 });
     await expect(succes(page)).toContainText("La séance a été refusée");
@@ -156,6 +182,13 @@ test.describe("Parcours coach — cycle de validation (E-20 à E-24)", () => {
     await expect(
       page.getByText("Séance trop intense pour cette semaine, on allège."),
     ).toBeVisible();
+
+    // N7 (RG-37/RG-33) : le nageur reçoit le commentaire de refus et
+    // l'action de regénération immédiate.
+    const emailRefusee = await waitForEmail(user.nageurEmail, { afterId: inboxNageur });
+    expect(emailRefusee.subject).toBe("Votre séance a été refusée");
+    expect(emailRefusee.text).toContain("Séance trop intense pour cette semaine, on allège.");
+    expect(emailRefusee.html).toContain("/seances/generer");
   });
 
   test("mes nageurs : profil, historique et auto-évaluations (E-24, RG-35)", async ({
