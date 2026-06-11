@@ -16,6 +16,11 @@
   --primary: #0ea5e9;
   --primary-hover: #0284c7;
   --primary-soft: #e0f2fe;
+  /* ADR-026 — fond des surfaces à texte/icône BLANC (boutons pleins…) :
+     #0369a1 ≈ 5,9:1 sur blanc (AA). --primary reste l'accent non textuel
+     (bordures, jauges, focus, badges à texte foncé). */
+  --primary-strong: #0369a1;
+  --primary-strong-hover: #075985;
 
   /* Session status colors (B4 base + B3 soft/text declensions for AA contrast) */
   --status-pending: #f59e0b;
