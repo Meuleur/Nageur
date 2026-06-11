@@ -30,6 +30,10 @@ const SQL = [
   `delete from public.seances where nageur_id in (select id from public.profiles where email in ${GENERATION_E2E_EMAILS});`,
   `delete from public.seances where statut = 'en_attente' and nageur_id in (select id from public.profiles where email in ${REGENERATION_E2E_EMAILS});`,
   `delete from public.auto_evaluations where nageur_id in (select id from public.profiles where email in ${DETAIL_E2E_EMAILS});`,
+  // Comptes CH6 « coach » : les séances consommées (valider / modifier /
+  // refuser) sont supprimées et réinsérées en_attente — un UPDATE de retour
+  // est impossible, les statuts terminaux sont protégés par trigger (RG-30).
+  "select public.reseed_ch6_e2e();",
 ].join(" ");
 
 export default function globalSetup() {

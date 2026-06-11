@@ -24,7 +24,8 @@ const distanceSchema = (message: string) =>
     .min(0, message)
     .multipleOf(25, "Les distances doivent être des multiples de 25 m.");
 
-const blocSchema = z.object({
+/** Échauffement / retour au calme — partagé avec l'édition coach (CH6, E-23). */
+export const blocSeanceSchema = z.object({
   distance_m: distanceSchema("Distance du bloc invalide."),
   consignes: z.string("Consignes du bloc invalides."),
 });
@@ -88,11 +89,11 @@ export type ContraintesGeneration = {
 export function buildSeanceGenereeSchema(contraintes: ContraintesGeneration) {
   return z
     .object({
-      echauffement: blocSchema,
+      echauffement: blocSeanceSchema,
       corps: z
         .array(serieGenereeSchema, "Corps de séance invalide.")
         .min(1, "Le corps de séance doit contenir au moins une série."),
-      retour_au_calme: blocSchema,
+      retour_au_calme: blocSeanceSchema,
       distance_totale_m: z.number("Distance totale invalide.").int().positive(),
       duree_estimee_min: z.number("Durée estimée invalide.").int().positive(),
     })
