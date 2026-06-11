@@ -6,9 +6,12 @@ import { ArrowLeft, CheckCircle2, Clock, MessageSquareQuote, Ruler, Timer } from
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  SeanceContenu,
+  type SerieAffichee,
+} from "@/features/seances/components/seance-contenu";
 import { StatutBadge } from "@/features/seances/components/statut-badge";
-import { formatDateSeance, formatDistance, formatDuree, TYPE_NAGE_LABELS } from "@/features/seances/labels";
-import type { TypeNage } from "@/features/seances/schemas";
+import { formatDateSeance, formatDistance, formatDuree } from "@/features/seances/labels";
 import { estStatutSeance } from "@/features/seances/statuts";
 import { createSessionClient } from "@/lib/supabase/session";
 
@@ -33,15 +36,6 @@ function SeanceIntrouvable() {
     </Card>
   );
 }
-
-type SerieAffichee = {
-  ordre: number;
-  repetitions: number;
-  distance_m: number;
-  type_nage: TypeNage;
-  recuperation_s: number;
-  consigne: string | null;
-};
 
 /**
  * E-14 — Détail d'une séance (PN-7/PN-8, RG-32) :
@@ -224,60 +218,7 @@ export default async function DetailSeancePage({
 
       {resume}
 
-      <Card>
-        <CardHeader>
-          <CardTitle>
-            <h2>Échauffement</h2>
-          </CardTitle>
-          {seance.echauffement_distance_m === null ? null : (
-            <CardDescription>{formatDistance(seance.echauffement_distance_m)}</CardDescription>
-          )}
-        </CardHeader>
-        {seance.echauffement_consignes ? (
-          <CardContent className="text-sm">{seance.echauffement_consignes}</CardContent>
-        ) : null}
-      </Card>
-
-      <Card>
-        <CardHeader>
-          <CardTitle>
-            <h2>Corps de séance</h2>
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <ol className="space-y-4">
-            {((series ?? []) as SerieAffichee[]).map((serie) => (
-              <li
-                key={serie.ordre}
-                className="space-y-1 border-b border-border pb-4 last:border-b-0 last:pb-0"
-              >
-                <p className="text-sm font-semibold">
-                  {serie.repetitions} × {formatDistance(serie.distance_m)} —{" "}
-                  {TYPE_NAGE_LABELS[serie.type_nage] ?? serie.type_nage}
-                </p>
-                <p className="text-caption text-muted-foreground">
-                  Récupération&nbsp;: {serie.recuperation_s} s
-                </p>
-                {serie.consigne ? <p className="text-sm">{serie.consigne}</p> : null}
-              </li>
-            ))}
-          </ol>
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader>
-          <CardTitle>
-            <h2>Retour au calme</h2>
-          </CardTitle>
-          {seance.retour_calme_distance_m === null ? null : (
-            <CardDescription>{formatDistance(seance.retour_calme_distance_m)}</CardDescription>
-          )}
-        </CardHeader>
-        {seance.retour_calme_consignes ? (
-          <CardContent className="text-sm">{seance.retour_calme_consignes}</CardContent>
-        ) : null}
-      </Card>
+      <SeanceContenu seance={seance} series={(series ?? []) as SerieAffichee[]} />
 
       {seance.commentaire_coach ? (
         <Card>
