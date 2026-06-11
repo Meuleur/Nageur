@@ -279,6 +279,35 @@ const ACCES_REFUSE_USERS: Record<string, AccesRefuseUser> = {
   "mobile-chrome": { nageurEmail: "sam.nageur@nageur.test", coachEmail: "prune.coach@nageur.test" },
 };
 
+type ParcoursUser = { adminEmail: string; coach: string; coachEmail: string };
+
+/**
+ * CH9 — parcours critique bout-en-bout : admin + coach dédiés par projet,
+ * le nageur est créé dynamiquement par le test (e2e-parcours-…@nageur.test,
+ * purgé par reseed_ch9_e2e).
+ */
+const PARCOURS_USERS: Record<string, ParcoursUser> = {
+  chromium: {
+    adminEmail: "wanda.admin@nageur.test",
+    coach: "Ugo Vidal",
+    coachEmail: "ugo.coach@nageur.test",
+  },
+  "mobile-chrome": {
+    adminEmail: "yael.admin@nageur.test",
+    coach: "Vera Munoz",
+    coachEmail: "vera.coach@nageur.test",
+  },
+};
+
+/**
+ * CH9 — séance seedée d'un AUTRE nageur (Jade / Lina, jeux en lecture seule
+ * de CH5) : l'isolation RLS par URL directe doit répondre « introuvable ».
+ */
+const SEANCE_AUTRE_NAGEUR: Record<string, string> = {
+  chromium: "40000000-0000-4000-8000-000000000008",
+  "mobile-chrome": "40000000-0000-4000-8000-000000000012",
+};
+
 function forProject<T>(map: Record<string, T>, testInfo: TestInfo): T {
   const value = map[testInfo.project.name];
   if (!value) {
@@ -311,3 +340,6 @@ export const adminAffectationFor = (testInfo: TestInfo) =>
 export const adminInvitationFor = (testInfo: TestInfo) =>
   forProject(ADMIN_INVITATION_USERS, testInfo);
 export const accesRefuseFor = (testInfo: TestInfo) => forProject(ACCES_REFUSE_USERS, testInfo);
+export const parcoursFor = (testInfo: TestInfo) => forProject(PARCOURS_USERS, testInfo);
+export const seanceAutreNageurFor = (testInfo: TestInfo) =>
+  forProject(SEANCE_AUTRE_NAGEUR, testInfo);

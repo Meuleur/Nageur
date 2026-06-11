@@ -37,6 +37,9 @@ const SQL = [
   // Comptes CH8 « admin » : affectations E2E remises à « sans coach »,
   // coachs invités supprimés, fournisseurs LLM remis à l'état seed.
   "select public.reseed_ch8_e2e();",
+  // Comptes dynamiques (inscription CH2, parcours CH9) : purgés pour éviter
+  // l'accumulation entre exécutions.
+  "select public.reseed_ch9_e2e();",
 ].join(" ");
 
 export default function globalSetup() {
