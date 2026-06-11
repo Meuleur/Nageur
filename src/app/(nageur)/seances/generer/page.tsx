@@ -58,7 +58,7 @@ export default async function GenererSeancePage() {
       <header className="space-y-2">
         <Link
           href="/accueil"
-          className="inline-flex items-center gap-1 text-sm text-primary underline-offset-4 hover:underline"
+          className="inline-flex min-h-11 items-center gap-1 text-sm text-primary underline-offset-4 hover:underline"
         >
           <ArrowLeft className="size-4" aria-hidden />
           Retour à l&apos;accueil

@@ -91,7 +91,7 @@ export default async function DetailNageurPage({
     <main className="mx-auto w-full max-w-3xl flex-1 space-y-6 px-4 py-10 sm:px-6">
       <Link
         href="/coach/nageurs"
-        className="inline-flex items-center gap-1 text-sm text-primary underline-offset-4 hover:underline"
+        className="inline-flex min-h-11 items-center gap-1 text-sm text-primary underline-offset-4 hover:underline"
       >
         <ArrowLeft className="size-4" aria-hidden />
         Retour à mes nageurs

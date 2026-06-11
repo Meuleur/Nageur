@@ -301,7 +301,6 @@ export function ModifierSeanceForm({ seance }: { seance: SeanceAModifier }) {
                 <Button
                   type="button"
                   variant="outline"
-                  size="sm"
                   onClick={() => deplacerSerie(serie.cle, -1)}
                   disabled={index === 0}
                   aria-label={`Monter la série ${index + 1}`}
@@ -312,7 +311,6 @@ export function ModifierSeanceForm({ seance }: { seance: SeanceAModifier }) {
                 <Button
                   type="button"
                   variant="outline"
-                  size="sm"
                   onClick={() => deplacerSerie(serie.cle, 1)}
                   disabled={index === series.length - 1}
                   aria-label={`Descendre la série ${index + 1}`}
@@ -323,7 +321,6 @@ export function ModifierSeanceForm({ seance }: { seance: SeanceAModifier }) {
                 <Button
                   type="button"
                   variant="destructive"
-                  size="sm"
                   onClick={() => supprimerSerie(serie.cle)}
                   disabled={series.length === 1}
                   aria-label={`Supprimer la série ${index + 1}`}

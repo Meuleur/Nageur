@@ -117,3 +117,17 @@
     @apply font-sans;
   }
 }
+
+/* B4 — prefers-reduced-motion respecté pour les animations/transitions CSS
+   (Framer Motion le gère via MotionConfig reducedMotion="user"). Durée quasi
+   nulle plutôt que `none` : les états finaux des animations restent posés. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

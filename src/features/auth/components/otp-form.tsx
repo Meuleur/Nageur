@@ -116,7 +116,6 @@ export function OtpForm({ initialExpiresAt }: { initialExpiresAt: number }) {
         <Button
           type="submit"
           variant="ghost"
-          size="sm"
           disabled={resendWaitSeconds > 0}
           aria-live="polite"
         >

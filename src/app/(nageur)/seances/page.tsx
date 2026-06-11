@@ -32,7 +32,7 @@ function FiltreChip({
     <Link
       href={href}
       aria-current={actif ? "true" : undefined}
-      className={`inline-flex min-h-9 items-center gap-1.5 rounded-full border px-3.5 py-1.5 text-sm font-medium transition-colors select-none ${
+      className={`inline-flex min-h-11 items-center gap-1.5 rounded-full border px-3.5 py-1.5 text-sm font-medium transition-colors select-none ${
         actif
           ? "border-primary/50 bg-primary-soft text-primary-hover"
           : "border-border bg-card hover:bg-muted"
@@ -92,7 +92,7 @@ export default async function MesSeancesPage({
       <header className="space-y-2">
         <Link
           href="/accueil"
-          className="inline-flex items-center gap-1 text-sm text-primary underline-offset-4 hover:underline"
+          className="inline-flex min-h-11 items-center gap-1 text-sm text-primary underline-offset-4 hover:underline"
         >
           <ArrowLeft className="size-4" aria-hidden />
           Retour à l&apos;accueil
