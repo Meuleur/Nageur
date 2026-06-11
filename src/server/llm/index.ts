@@ -1,5 +1,6 @@
 import "server-only";
 
+import { createServiceRoleClient } from "@/lib/supabase/server";
 import { chargerContexteGeneration } from "@/server/data/nageurs";
 import { insererSeanceGeneree } from "@/server/data/seances";
 import { getLlmDriver } from "@/server/env";
@@ -9,10 +10,12 @@ import { chargerConfigLlmActive } from "./config";
 import { genererSeanceAvecDeps } from "./generation";
 import { createClientLlm } from "./providers";
 import { createClientLlmSimule } from "./providers/simule";
-import type { ResultatGeneration } from "./types";
+import { testerCleFournisseur, type ResultatTestCle } from "./test-cle";
+import type { FournisseurLlm, ResultatGeneration } from "./types";
 
 export { GenerationSeanceError } from "./errors";
 export type { ResultatGeneration } from "./types";
+export type { ResultatTestCle } from "./test-cle";
 
 /**
  * Interface serveur unique de génération (C2) :
@@ -21,6 +24,35 @@ export type { ResultatGeneration } from "./types";
  * fournisseur, validation Zod, persistance service role. À brancher sur
  * l'écran nageur en CH5 (E-12).
  */
+/** Résultat du test de clé E-31 — « cle_absente » : rien à tester (C4). */
+export type ResultatTestCleAdmin = ResultatTestCle | { ok: false; code: "cle_absente" };
+
+/**
+ * Test de validité de la clé ENREGISTRÉE d'un fournisseur (E-31, C4) :
+ * lecture Vault côté serveur (get_llm_api_key, service role) puis appel
+ * minimal — aucune séance générée, aucun token consommé. Avec
+ * LLM_DRIVER=simule (dev/E2E), le test réussit sans réseau dès qu'une clé
+ * est enregistrée (aucun appel réel en CI, D2).
+ */
+export async function testerCleLlm(fournisseur: FournisseurLlm): Promise<ResultatTestCleAdmin> {
+  const supabase = createServiceRoleClient();
+  const { data, error } = await supabase.rpc("get_llm_api_key", {
+    p_fournisseur: fournisseur,
+  });
+
+  if (error) {
+    console.error("llm: lecture de la clé à tester impossible");
+    return { ok: false, code: "fournisseur_injoignable" };
+  }
+  if (!data || typeof data !== "string") {
+    return { ok: false, code: "cle_absente" };
+  }
+  if (getLlmDriver() === "simule") {
+    return { ok: true };
+  }
+  return testerCleFournisseur(fournisseur, { apiKey: data });
+}
+
 export async function genererSeance(nageurId: string): Promise<ResultatGeneration> {
   return genererSeanceAvecDeps(
     {
