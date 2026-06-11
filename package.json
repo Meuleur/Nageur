@@ -17,10 +17,12 @@
     "db:start": "supabase db start",
     "db:stop": "supabase stop",
     "db:reset": "supabase db reset --local",
-    "db:test": "supabase test db --local supabase/tests"
+    "db:test": "supabase test db --local supabase/tests",
+    "llm:set-key": "node scripts/llm-set-key.mjs"
   },
   "packageManager": "pnpm@10.19.0",
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.104.1",
     "@hookform/resolvers": "^5.4.0",
     "@supabase/ssr": "^0.12.0",
     "@supabase/supabase-js": "^2.108.1",
@@ -30,6 +32,7 @@
     "framer-motion": "^12.40.0",
     "lucide-react": "^1.17.0",
     "next": "16.2.9",
+    "openai": "^6.42.0",
     "radix-ui": "^1.5.0",
     "react": "19.2.4",
     "react-dom": "19.2.4",
