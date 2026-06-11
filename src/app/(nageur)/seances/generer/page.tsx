@@ -72,7 +72,9 @@ export default async function GenererSeancePage() {
 
       <Card>
         <CardHeader>
-          <CardTitle>Avant de générer</CardTitle>
+          <CardTitle>
+            <h2>Avant de générer</h2>
+          </CardTitle>
           <CardDescription>Deux conditions sont nécessaires :</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">

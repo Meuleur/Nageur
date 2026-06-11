@@ -20,7 +20,9 @@ function SeanceIntrouvable() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Séance introuvable</CardTitle>
+        <CardTitle>
+          <h2>Séance introuvable</h2>
+        </CardTitle>
         <CardDescription>
           Cette séance n&apos;existe pas ou ne vous appartient pas.{" "}
           <Link href="/seances" className="text-primary underline underline-offset-2">
@@ -142,7 +144,7 @@ export default async function DetailSeancePage({
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Clock className="size-5 text-status-pending" aria-hidden />
-              En attente de validation
+              <h2>En attente de validation</h2>
             </CardTitle>
             <CardDescription>
               Votre coach n&apos;a pas encore relu cette séance. Son contenu détaillé sera
@@ -164,7 +166,7 @@ export default async function DetailSeancePage({
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <MessageSquareQuote className="size-5 text-status-refused" aria-hidden />
-              Commentaire de votre coach
+              <h2>Commentaire de votre coach</h2>
             </CardTitle>
             <CardDescription>
               Cette séance a été refusée — elle n&apos;est pas utilisable. Vous pouvez demander
@@ -224,7 +226,9 @@ export default async function DetailSeancePage({
 
       <Card>
         <CardHeader>
-          <CardTitle>Échauffement</CardTitle>
+          <CardTitle>
+            <h2>Échauffement</h2>
+          </CardTitle>
           {seance.echauffement_distance_m === null ? null : (
             <CardDescription>{formatDistance(seance.echauffement_distance_m)}</CardDescription>
           )}
@@ -236,7 +240,9 @@ export default async function DetailSeancePage({
 
       <Card>
         <CardHeader>
-          <CardTitle>Corps de séance</CardTitle>
+          <CardTitle>
+            <h2>Corps de séance</h2>
+          </CardTitle>
         </CardHeader>
         <CardContent>
           <ol className="space-y-4">
@@ -261,7 +267,9 @@ export default async function DetailSeancePage({
 
       <Card>
         <CardHeader>
-          <CardTitle>Retour au calme</CardTitle>
+          <CardTitle>
+            <h2>Retour au calme</h2>
+          </CardTitle>
           {seance.retour_calme_distance_m === null ? null : (
             <CardDescription>{formatDistance(seance.retour_calme_distance_m)}</CardDescription>
           )}
@@ -276,7 +284,7 @@ export default async function DetailSeancePage({
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <MessageSquareQuote className="size-5 text-primary" aria-hidden />
-              Commentaire de votre coach
+              <h2>Commentaire de votre coach</h2>
             </CardTitle>
           </CardHeader>
           <CardContent className="text-sm">{seance.commentaire_coach}</CardContent>
@@ -285,7 +293,9 @@ export default async function DetailSeancePage({
 
       <Card>
         <CardHeader>
-          <CardTitle>Mon ressenti</CardTitle>
+          <CardTitle>
+            <h2>Mon ressenti</h2>
+          </CardTitle>
           <CardDescription>
             {autoEvaluation
               ? "Votre auto-évaluation — modifiable à tout moment."
