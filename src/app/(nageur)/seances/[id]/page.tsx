@@ -6,10 +6,7 @@ import { ArrowLeft, CheckCircle2, Clock, MessageSquareQuote, Ruler, Timer } from
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  SeanceContenu,
-  type SerieAffichee,
-} from "@/features/seances/components/seance-contenu";
+import { SeanceContenu, type SerieAffichee } from "@/features/seances/components/seance-contenu";
 import { StatutBadge } from "@/features/seances/components/statut-badge";
 import { formatDateSeance, formatDistance, formatDuree } from "@/features/seances/labels";
 import { estStatutSeance } from "@/features/seances/statuts";
@@ -93,8 +90,7 @@ export default async function DetailSeancePage({
     return entete(
       <Alert variant="destructive">
         <AlertDescription>
-          Impossible de charger la séance.{" "}
-          <Link href={`/seances/${id}`}>Réessayer</Link>
+          Impossible de charger la séance. <Link href={`/seances/${id}`}>Réessayer</Link>
         </AlertDescription>
       </Alert>,
     );
@@ -163,8 +159,8 @@ export default async function DetailSeancePage({
               <h2>Commentaire de votre coach</h2>
             </CardTitle>
             <CardDescription>
-              Cette séance a été refusée — elle n&apos;est pas utilisable. Vous pouvez demander
-              une nouvelle séance dès maintenant.
+              Cette séance a été refusée — elle n&apos;est pas utilisable. Vous pouvez demander une
+              nouvelle séance dès maintenant.
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">

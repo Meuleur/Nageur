@@ -24,17 +24,15 @@ export default async function ProfilPage() {
     redirect("/connexion");
   }
 
-  const [
-    { data: profil, error: erreurProfil },
-    { data: creneaux, error: erreurCreneaux },
-  ] = await Promise.all([
-    supabase
-      .from("swimmer_profiles")
-      .select("niveau, frequence, duree, bassin, objectifs, materiel")
-      .eq("nageur_id", user.id)
-      .maybeSingle(),
-    supabase.from("swimmer_availabilities").select("jour, moment").eq("nageur_id", user.id),
-  ]);
+  const [{ data: profil, error: erreurProfil }, { data: creneaux, error: erreurCreneaux }] =
+    await Promise.all([
+      supabase
+        .from("swimmer_profiles")
+        .select("niveau, frequence, duree, bassin, objectifs, materiel")
+        .eq("nageur_id", user.id)
+        .maybeSingle(),
+      supabase.from("swimmer_availabilities").select("jour, moment").eq("nageur_id", user.id),
+    ]);
   if (erreurProfil || erreurCreneaux) {
     // Sans cela, un échec de lecture présenterait un formulaire vierge que
     // l'enregistrement écraserait — l'écran d'erreur du groupe prend le relais.

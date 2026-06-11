@@ -53,8 +53,8 @@ export default async function SeancesAValiderPage() {
         </Link>
         <h1 className="text-2xl font-semibold sm:text-[28px] sm:leading-9">Séances à valider</h1>
         <p className="text-caption text-muted-foreground">
-          Les séances proposées par l&apos;IA pour vos nageurs, en attente de votre relecture —
-          les plus anciennes en premier.
+          Les séances proposées par l&apos;IA pour vos nageurs, en attente de votre relecture — les
+          plus anciennes en premier.
         </p>
       </header>
 

@@ -16,8 +16,8 @@ export function ErreurEcran({ reset }: { reset: () => void }) {
       <Alert variant="destructive">
         <AlertCircle aria-hidden />
         <AlertDescription>
-          Une erreur est survenue pendant le chargement de cet écran. Vos données n&apos;ont pas
-          été modifiées.
+          Une erreur est survenue pendant le chargement de cet écran. Vos données n&apos;ont pas été
+          modifiées.
         </AlertDescription>
       </Alert>
       <Button onClick={reset} variant="outline">

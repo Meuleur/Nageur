@@ -74,8 +74,7 @@ export default async function CoachPage() {
         <Alert variant="destructive">
           <AlertCircle aria-hidden />
           <AlertDescription>
-            Impossible de charger votre tableau de bord.{" "}
-            <Link href="/coach">Réessayer</Link>
+            Impossible de charger votre tableau de bord. <Link href="/coach">Réessayer</Link>
           </AlertDescription>
         </Alert>
       ) : (nageurs ?? []).length === 0 ? (
@@ -84,8 +83,8 @@ export default async function CoachPage() {
           <CardHeader>
             <CardTitle>Aucun nageur ne vous est encore affecté</CardTitle>
             <CardDescription>
-              Un administrateur doit vous affecter des nageurs. Vous verrez alors ici leurs
-              séances à valider et leur suivi.
+              Un administrateur doit vous affecter des nageurs. Vous verrez alors ici leurs séances
+              à valider et leur suivi.
             </CardDescription>
           </CardHeader>
         </Card>

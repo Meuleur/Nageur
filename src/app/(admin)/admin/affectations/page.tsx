@@ -16,10 +16,7 @@ export const metadata: Metadata = { title: "Affectations — App Natation" };
  */
 export default async function AffectationsPage() {
   await exigerSuperAdmin();
-  const [nageurs, coachs] = await Promise.all([
-    listerNageursPourAffectation(),
-    listerCoachs(),
-  ]);
+  const [nageurs, coachs] = await Promise.all([listerNageursPourAffectation(), listerCoachs()]);
   const sansCoach = nageurs.filter((nageur) => nageur.coachId === null).length;
 
   return (

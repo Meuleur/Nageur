@@ -322,13 +322,11 @@ export const lockoutUserFor = (testInfo: TestInfo) => forProject(LOCKOUT_USERS, 
 export const profilUserFor = (testInfo: TestInfo) => forProject(PROFIL_USERS, testInfo);
 export const sansCoachUserFor = (testInfo: TestInfo) => forProject(SANS_COACH_USERS, testInfo);
 export const generationUserFor = (testInfo: TestInfo) => forProject(GENERATION_USERS, testInfo);
-export const regenerationUserFor = (testInfo: TestInfo) =>
-  forProject(REGENERATION_USERS, testInfo);
+export const regenerationUserFor = (testInfo: TestInfo) => forProject(REGENERATION_USERS, testInfo);
 export const listeUserFor = (testInfo: TestInfo) => forProject(LISTE_USERS, testInfo);
 export const detailUserFor = (testInfo: TestInfo) => forProject(DETAIL_USERS, testInfo);
 export const coachValiderFor = (testInfo: TestInfo) => forProject(COACH_VALIDER_USERS, testInfo);
-export const coachModifierFor = (testInfo: TestInfo) =>
-  forProject(COACH_MODIFIER_USERS, testInfo);
+export const coachModifierFor = (testInfo: TestInfo) => forProject(COACH_MODIFIER_USERS, testInfo);
 export const coachRefuserFor = (testInfo: TestInfo) => forProject(COACH_REFUSER_USERS, testInfo);
 export const coachNageursFor = (testInfo: TestInfo) => forProject(COACH_NAGEURS_USERS, testInfo);
 export const adminMetriquesFor = (testInfo: TestInfo) =>

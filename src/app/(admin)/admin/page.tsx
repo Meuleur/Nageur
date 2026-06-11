@@ -73,7 +73,11 @@ export default async function AdminPage({
             valeur={n(metriques.seances.generees)}
             detail={`Anthropic ${n(metriques.par_fournisseur.anthropic)} · OpenAI ${n(metriques.par_fournisseur.openai)}`}
           />
-          <Metrique libelle="Taux de validation" valeur={formatTauxValidation(taux)} detail="(validées + modifiées) / générées" />
+          <Metrique
+            libelle="Taux de validation"
+            valeur={formatTauxValidation(taux)}
+            detail="(validées + modifiées) / générées"
+          />
           <Metrique
             libelle="Séances en attente"
             valeur={n(metriques.seances.en_attente)}
@@ -105,8 +109,8 @@ export default async function AdminPage({
           </CardTitle>
           <CardDescription>
             L&apos;administration accède aux identités, aux rôles, aux affectations et à ces
-            agrégats — jamais au contenu des séances ni aux auto-évaluations des nageurs
-            (RG-40, ADR-020).
+            agrégats — jamais au contenu des séances ni aux auto-évaluations des nageurs (RG-40,
+            ADR-020).
           </CardDescription>
         </CardHeader>
       </Card>

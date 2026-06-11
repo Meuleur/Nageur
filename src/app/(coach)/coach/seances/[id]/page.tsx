@@ -5,10 +5,7 @@ import { ArrowLeft, CheckCircle2, MessageSquareQuote, Ruler, Timer } from "lucid
 
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  SeanceContenu,
-  type SerieAffichee,
-} from "@/features/seances/components/seance-contenu";
+import { SeanceContenu, type SerieAffichee } from "@/features/seances/components/seance-contenu";
 import { StatutBadge } from "@/features/seances/components/statut-badge";
 import { formatDateSeance, formatDistance, formatDuree } from "@/features/seances/labels";
 import { estStatutSeance } from "@/features/seances/statuts";
@@ -72,8 +69,7 @@ export default async function RelectureSeancePage({
 
   const { id } = await params;
   const traitement = (await searchParams).traitement;
-  const confirmation =
-    typeof traitement === "string" ? (CONFIRMATIONS[traitement] ?? null) : null;
+  const confirmation = typeof traitement === "string" ? (CONFIRMATIONS[traitement] ?? null) : null;
 
   const entete = (contenu: React.ReactNode) => (
     <main className="mx-auto w-full max-w-3xl flex-1 space-y-6 px-4 py-10 sm:px-6">
@@ -104,8 +100,7 @@ export default async function RelectureSeancePage({
     return entete(
       <Alert variant="destructive">
         <AlertDescription>
-          Impossible de charger la séance.{" "}
-          <Link href={`/coach/seances/${id}`}>Réessayer</Link>
+          Impossible de charger la séance. <Link href={`/coach/seances/${id}`}>Réessayer</Link>
         </AlertDescription>
       </Alert>,
     );

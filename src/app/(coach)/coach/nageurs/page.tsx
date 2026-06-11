@@ -42,8 +42,7 @@ export default async function MesNageursPage() {
         </Link>
         <h1 className="text-2xl font-semibold sm:text-[28px] sm:leading-9">Mes nageurs</h1>
         <p className="text-caption text-muted-foreground">
-          Les nageurs qui vous sont affectés — profil, historique des séances et
-          auto-évaluations.
+          Les nageurs qui vous sont affectés — profil, historique des séances et auto-évaluations.
         </p>
       </header>
 

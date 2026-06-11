@@ -21,7 +21,9 @@ function Precondition({ remplie, children }: { remplie: boolean; children: React
       />
       <span>
         {children}
-        <span className="sr-only">{remplie ? " — condition remplie" : " — condition manquante"}</span>
+        <span className="sr-only">
+          {remplie ? " — condition remplie" : " — condition manquante"}
+        </span>
       </span>
     </li>
   );
@@ -83,7 +85,11 @@ export default async function GenererSeancePage() {
               Avoir un coach —{" "}
               {coach ? (
                 <>
-                  votre coach est <strong>{coach.prenom} {coach.nom}</strong>.
+                  votre coach est{" "}
+                  <strong>
+                    {coach.prenom} {coach.nom}
+                  </strong>
+                  .
                 </>
               ) : (
                 <>

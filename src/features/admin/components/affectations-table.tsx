@@ -14,13 +14,7 @@ import { ADMIN_FORM_IDLE } from "../form-state";
 import type { CoachAdmin, NageurAffectation } from "@/server/data/admin";
 
 /** Une ligne = un nageur + son formulaire d'affectation (PA-4). */
-function LigneNageur({
-  nageur,
-  coachs,
-}: {
-  nageur: NageurAffectation;
-  coachs: CoachAdmin[];
-}) {
+function LigneNageur({ nageur, coachs }: { nageur: NageurAffectation; coachs: CoachAdmin[] }) {
   const [state, formAction, isPending] = useActionState(affecterCoachAction, ADMIN_FORM_IDLE);
   // Sélection contrôlée : survit au reset automatique des formulaires
   // (React 19) et n'écrase pas le choix après l'aller-retour serveur.
@@ -59,7 +53,7 @@ function LigneNageur({
           name="coach_id"
           value={coachId}
           onChange={(event) => setCoachId(event.target.value)}
-          className="h-9 w-full min-w-0 flex-1 rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-xs transition-colors focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 sm:max-w-72"
+          className="h-11 w-full min-w-0 flex-1 rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-xs transition-colors focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 sm:max-w-72"
         >
           <option value="">Sans coach</option>
           {coachs.map((coach) => (
@@ -68,7 +62,12 @@ function LigneNageur({
             </option>
           ))}
         </select>
-        <Button type="submit" variant="outline" disabled={isPending || inchangee} aria-busy={isPending}>
+        <Button
+          type="submit"
+          variant="outline"
+          disabled={isPending || inchangee}
+          aria-busy={isPending}
+        >
           {isPending ? <Loader2 className="animate-spin" aria-hidden /> : null}
           Enregistrer
         </Button>

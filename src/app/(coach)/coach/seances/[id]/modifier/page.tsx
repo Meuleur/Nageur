@@ -42,11 +42,7 @@ function SeanceIntrouvable() {
  * retour au détail. Lectures sous RLS (RG-25) ; la transition finale passe
  * par l'action serveur (service role).
  */
-export default async function ModifierSeancePage({
-  params,
-}: {
-  params: Promise<{ id: string }>;
-}) {
+export default async function ModifierSeancePage({ params }: { params: Promise<{ id: string }> }) {
   const supabase = await createSessionClient();
   const {
     data: { user },
