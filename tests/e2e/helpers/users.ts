@@ -205,6 +205,80 @@ const COACH_NAGEURS_USERS: Record<string, CoachNageursUser> = {
   },
 };
 
+/**
+ * CH8 — espace admin (E-30 à E-33), un compte SUPER ADMIN par test ET par
+ * projet Playwright. Le test fournisseurs ne tourne que sur chromium (le
+ * fournisseur actif est un état GLOBAL, RG-38 — deux projets en parallèle
+ * se marcheraient dessus) ; reseed_ch8_e2e() remet affectations, coachs
+ * invités et fournisseurs à l'état seed.
+ */
+
+/** Tableau de bord métriques (E-30). */
+const ADMIN_METRIQUES_USERS: Record<string, string> = {
+  chromium: "gael.admin@nageur.test",
+  "mobile-chrome": "kenza.admin@nageur.test",
+};
+
+/** Fournisseurs LLM (E-31) — chromium uniquement (état global). */
+const ADMIN_FOURNISSEURS_USERS: Record<string, string> = {
+  chromium: "hana.admin@nageur.test",
+  "mobile-chrome": "lior.admin@nageur.test",
+};
+
+type AdminAffectationUser = {
+  email: string;
+  nageur: string;
+  nageurEmail: string;
+  coach: string;
+};
+
+/** Affectations + N8 (E-32) : Lou/Maé seedés SANS coach, cible Sacha. */
+const ADMIN_AFFECTATION_USERS: Record<string, AdminAffectationUser> = {
+  chromium: {
+    email: "igor.admin@nageur.test",
+    nageur: "Lou Marin",
+    nageurEmail: "lou.nageur@nageur.test",
+    coach: "Sacha Royer",
+  },
+  "mobile-chrome": {
+    email: "milo.admin@nageur.test",
+    nageur: "Maé Garnier",
+    nageurEmail: "mae.nageur@nageur.test",
+    coach: "Sacha Royer",
+  },
+};
+
+type AdminInvitationUser = {
+  email: string;
+  invitePrenom: string;
+  inviteNom: string;
+  inviteEmail: string;
+};
+
+/** Invitation coach (E-33) — comptes invités supprimés par reseed_ch8_e2e. */
+const ADMIN_INVITATION_USERS: Record<string, AdminInvitationUser> = {
+  chromium: {
+    email: "jana.admin@nageur.test",
+    invitePrenom: "Rita",
+    inviteNom: "Sauveterre",
+    inviteEmail: "invite.chromium@nageur.test",
+  },
+  "mobile-chrome": {
+    email: "nora.admin@nageur.test",
+    invitePrenom: "Ugo",
+    inviteNom: "Valette",
+    inviteEmail: "invite.mobile@nageur.test",
+  },
+};
+
+type AccesRefuseUser = { nageurEmail: string; coachEmail: string };
+
+/** L'espace admin est interdit aux autres rôles (RG-03/RG-40). */
+const ACCES_REFUSE_USERS: Record<string, AccesRefuseUser> = {
+  chromium: { nageurEmail: "nour.nageur@nageur.test", coachEmail: "oscar.coach@nageur.test" },
+  "mobile-chrome": { nageurEmail: "sam.nageur@nageur.test", coachEmail: "prune.coach@nageur.test" },
+};
+
 function forProject<T>(map: Record<string, T>, testInfo: TestInfo): T {
   const value = map[testInfo.project.name];
   if (!value) {
@@ -228,3 +302,12 @@ export const coachModifierFor = (testInfo: TestInfo) =>
   forProject(COACH_MODIFIER_USERS, testInfo);
 export const coachRefuserFor = (testInfo: TestInfo) => forProject(COACH_REFUSER_USERS, testInfo);
 export const coachNageursFor = (testInfo: TestInfo) => forProject(COACH_NAGEURS_USERS, testInfo);
+export const adminMetriquesFor = (testInfo: TestInfo) =>
+  forProject(ADMIN_METRIQUES_USERS, testInfo);
+export const adminFournisseursFor = (testInfo: TestInfo) =>
+  forProject(ADMIN_FOURNISSEURS_USERS, testInfo);
+export const adminAffectationFor = (testInfo: TestInfo) =>
+  forProject(ADMIN_AFFECTATION_USERS, testInfo);
+export const adminInvitationFor = (testInfo: TestInfo) =>
+  forProject(ADMIN_INVITATION_USERS, testInfo);
+export const accesRefuseFor = (testInfo: TestInfo) => forProject(ACCES_REFUSE_USERS, testInfo);

@@ -21,6 +21,10 @@ const NOTICES: Record<string, { variant: "default" | "success"; text: string }> 
     variant: "default",
     text: "Votre session de connexion a expiré. Reconnectez-vous.",
   },
+  "invitation-expiree": {
+    variant: "default",
+    text: "Ce lien d'invitation est expiré ou a déjà servi. Demandez une nouvelle invitation à l'administrateur.",
+  },
 };
 
 export default async function ConnexionPage({

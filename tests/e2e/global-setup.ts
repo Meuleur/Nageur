@@ -34,6 +34,9 @@ const SQL = [
   // refuser) sont supprimées et réinsérées en_attente — un UPDATE de retour
   // est impossible, les statuts terminaux sont protégés par trigger (RG-30).
   "select public.reseed_ch6_e2e();",
+  // Comptes CH8 « admin » : affectations E2E remises à « sans coach »,
+  // coachs invités supprimés, fournisseurs LLM remis à l'état seed.
+  "select public.reseed_ch8_e2e();",
 ].join(" ");
 
 export default function globalSetup() {

@@ -20,6 +20,7 @@ export type AuthAuditEvent =
   | "auth.otp_verified"
   | "auth.password_reset_requested"
   | "auth.password_reset_completed"
+  | "auth.invitation_acceptee"
   | "auth.logout"
   | "auth.rate_limited";
 
