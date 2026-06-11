@@ -471,3 +471,83 @@ revoke all on function public.reseed_ch6_e2e() from public, anon, authenticated;
 -- un `select reseed_ch6_e2e()` nu échouerait (fonction créée dans ce même
 -- lot) ; le corps d'un DO n'est résolu qu'à l'exécution.
 do $$ begin perform public.reseed_ch6_e2e(); end $$;
+
+-- ---------------------------------------------------------------------------
+-- Comptes E2E CH8 (espace admin) — un compte par TEST et par PROJET
+-- Playwright (codes OTP à usage unique, voir tests/e2e/helpers/users.ts) :
+--   * Gaël / Kenza   : tableau de bord métriques (E-30) ;
+--   * Hana / Lior    : fournisseurs LLM (E-31 — exécuté sur chromium seul,
+--     le fournisseur actif est un état GLOBAL, RG-38) ;
+--   * Igor / Milo    : affectations + N8 (E-32) — affectent Lou / Maé,
+--     nageurs SANS coach (remis à zéro par reseed_ch8_e2e) ;
+--   * Jana / Nora    : invitation coach (E-33) — invite.chromium@ /
+--     invite.mobile@ (supprimés par reseed_ch8_e2e) ;
+--   * Nour / Sam (nageurs) et Oscar / Prune (coachs) : l'espace admin leur
+--     est inaccessible (RG-03/RG-40).
+-- ---------------------------------------------------------------------------
+insert into auth.users
+  (instance_id, id, aud, role, email, encrypted_password, email_confirmed_at,
+   raw_app_meta_data, raw_user_meta_data, created_at, updated_at,
+   confirmation_token, recovery_token, email_change_token_new, email_change)
+values
+  ('00000000-0000-0000-0000-000000000000', '10000000-0000-4000-8000-000000000011', 'authenticated', 'authenticated', 'gael.admin@nageur.test',  extensions.crypt('Password123!', extensions.gen_salt('bf')), now(), '{"provider":"email","providers":["email"]}', '{}', now(), now(), '', '', '', ''),
+  ('00000000-0000-0000-0000-000000000000', '10000000-0000-4000-8000-000000000012', 'authenticated', 'authenticated', 'hana.admin@nageur.test',  extensions.crypt('Password123!', extensions.gen_salt('bf')), now(), '{"provider":"email","providers":["email"]}', '{}', now(), now(), '', '', '', ''),
+  ('00000000-0000-0000-0000-000000000000', '10000000-0000-4000-8000-000000000013', 'authenticated', 'authenticated', 'igor.admin@nageur.test',  extensions.crypt('Password123!', extensions.gen_salt('bf')), now(), '{"provider":"email","providers":["email"]}', '{}', now(), now(), '', '', '', ''),
+  ('00000000-0000-0000-0000-000000000000', '10000000-0000-4000-8000-000000000014', 'authenticated', 'authenticated', 'jana.admin@nageur.test',  extensions.crypt('Password123!', extensions.gen_salt('bf')), now(), '{"provider":"email","providers":["email"]}', '{}', now(), now(), '', '', '', ''),
+  ('00000000-0000-0000-0000-000000000000', '10000000-0000-4000-8000-000000000015', 'authenticated', 'authenticated', 'kenza.admin@nageur.test', extensions.crypt('Password123!', extensions.gen_salt('bf')), now(), '{"provider":"email","providers":["email"]}', '{}', now(), now(), '', '', '', ''),
+  ('00000000-0000-0000-0000-000000000000', '10000000-0000-4000-8000-000000000016', 'authenticated', 'authenticated', 'lior.admin@nageur.test',  extensions.crypt('Password123!', extensions.gen_salt('bf')), now(), '{"provider":"email","providers":["email"]}', '{}', now(), now(), '', '', '', ''),
+  ('00000000-0000-0000-0000-000000000000', '10000000-0000-4000-8000-000000000017', 'authenticated', 'authenticated', 'milo.admin@nageur.test',  extensions.crypt('Password123!', extensions.gen_salt('bf')), now(), '{"provider":"email","providers":["email"]}', '{}', now(), now(), '', '', '', ''),
+  ('00000000-0000-0000-0000-000000000000', '10000000-0000-4000-8000-000000000018', 'authenticated', 'authenticated', 'nora.admin@nageur.test',  extensions.crypt('Password123!', extensions.gen_salt('bf')), now(), '{"provider":"email","providers":["email"]}', '{}', now(), now(), '', '', '', ''),
+  ('00000000-0000-0000-0000-000000000000', '30000000-0000-4000-8000-000000000025', 'authenticated', 'authenticated', 'lou.nageur@nageur.test',  extensions.crypt('Password123!', extensions.gen_salt('bf')), now(), '{"provider":"email","providers":["email"]}', '{}', now(), now(), '', '', '', ''),
+  ('00000000-0000-0000-0000-000000000000', '30000000-0000-4000-8000-000000000026', 'authenticated', 'authenticated', 'mae.nageur@nageur.test',  extensions.crypt('Password123!', extensions.gen_salt('bf')), now(), '{"provider":"email","providers":["email"]}', '{}', now(), now(), '', '', '', ''),
+  ('00000000-0000-0000-0000-000000000000', '30000000-0000-4000-8000-000000000027', 'authenticated', 'authenticated', 'nour.nageur@nageur.test', extensions.crypt('Password123!', extensions.gen_salt('bf')), now(), '{"provider":"email","providers":["email"]}', '{}', now(), now(), '', '', '', ''),
+  ('00000000-0000-0000-0000-000000000000', '30000000-0000-4000-8000-000000000028', 'authenticated', 'authenticated', 'sam.nageur@nageur.test',  extensions.crypt('Password123!', extensions.gen_salt('bf')), now(), '{"provider":"email","providers":["email"]}', '{}', now(), now(), '', '', '', ''),
+  ('00000000-0000-0000-0000-000000000000', '20000000-0000-4000-8000-000000000012', 'authenticated', 'authenticated', 'oscar.coach@nageur.test', extensions.crypt('Password123!', extensions.gen_salt('bf')), now(), '{"provider":"email","providers":["email"]}', '{}', now(), now(), '', '', '', ''),
+  ('00000000-0000-0000-0000-000000000000', '20000000-0000-4000-8000-000000000013', 'authenticated', 'authenticated', 'prune.coach@nageur.test', extensions.crypt('Password123!', extensions.gen_salt('bf')), now(), '{"provider":"email","providers":["email"]}', '{}', now(), now(), '', '', '', '')
+on conflict (id) do nothing;
+
+insert into public.profiles (id, role, prenom, nom, email, coach_id) values
+  ('10000000-0000-4000-8000-000000000011', 'super_admin', 'Gaël',  'Admin',   'gael.admin@nageur.test',  null),
+  ('10000000-0000-4000-8000-000000000012', 'super_admin', 'Hana',  'Admin',   'hana.admin@nageur.test',  null),
+  ('10000000-0000-4000-8000-000000000013', 'super_admin', 'Igor',  'Admin',   'igor.admin@nageur.test',  null),
+  ('10000000-0000-4000-8000-000000000014', 'super_admin', 'Jana',  'Admin',   'jana.admin@nageur.test',  null),
+  ('10000000-0000-4000-8000-000000000015', 'super_admin', 'Kenza', 'Admin',   'kenza.admin@nageur.test', null),
+  ('10000000-0000-4000-8000-000000000016', 'super_admin', 'Lior',  'Admin',   'lior.admin@nageur.test',  null),
+  ('10000000-0000-4000-8000-000000000017', 'super_admin', 'Milo',  'Admin',   'milo.admin@nageur.test',  null),
+  ('10000000-0000-4000-8000-000000000018', 'super_admin', 'Nora',  'Admin',   'nora.admin@nageur.test',  null),
+  ('30000000-0000-4000-8000-000000000025', 'nageur',      'Lou',   'Marin',   'lou.nageur@nageur.test',  null),
+  ('30000000-0000-4000-8000-000000000026', 'nageur',      'Maé',   'Garnier', 'mae.nageur@nageur.test',  null),
+  ('30000000-0000-4000-8000-000000000027', 'nageur',      'Nour',  'Petit',   'nour.nageur@nageur.test', null),
+  ('30000000-0000-4000-8000-000000000028', 'nageur',      'Sam',   'Dubois',  'sam.nageur@nageur.test',  null),
+  ('20000000-0000-4000-8000-000000000012', 'coach',       'Oscar', 'Blanc',   'oscar.coach@nageur.test', null),
+  ('20000000-0000-4000-8000-000000000013', 'coach',       'Prune', 'Morel',   'prune.coach@nageur.test', null)
+on conflict (id) do nothing;
+
+-- ---------------------------------------------------------------------------
+-- reseed_ch8_e2e — suites E2E admin rejouables (appelée par global-setup) :
+-- affectations E2E remises à « sans coach », coachs invités supprimés
+-- (cascade auth.users → profiles), fournisseurs LLM remis à l'état seed.
+-- ---------------------------------------------------------------------------
+create or replace function public.reseed_ch8_e2e() returns void
+language plpgsql
+as $$
+begin
+  update public.profiles set coach_id = null
+  where email in ('lou.nageur@nageur.test', 'mae.nageur@nageur.test');
+
+  delete from auth.users
+  where email in ('invite.chromium@nageur.test', 'invite.mobile@nageur.test');
+
+  perform public.set_llm_api_key('anthropic', 'sk-ant-seed-cle-factice');
+  perform public.set_llm_api_key('openai',    'sk-seed-cle-factice');
+  -- Ordre imposé par l'index « un seul actif » : désactivation d'abord.
+  update public.llm_providers set is_active = false, modele = 'gpt-4o'
+  where fournisseur = 'openai';
+  update public.llm_providers set is_active = true, modele = 'claude-sonnet-4-6'
+  where fournisseur = 'anthropic';
+end;
+$$;
+
+revoke all on function public.reseed_ch8_e2e() from public, anon, authenticated;
+
+do $$ begin perform public.reseed_ch8_e2e(); end $$;

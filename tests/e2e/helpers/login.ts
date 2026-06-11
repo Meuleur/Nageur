@@ -14,12 +14,13 @@ export async function seConnecter(
   page: Page,
   email: string,
   accueil: RegExp = /\/accueil/,
+  motDePasse: string = SEED_PASSWORD,
 ): Promise<void> {
   const inboxBefore = await latestEmailId(email);
 
   await page.goto("/connexion");
   await page.getByLabel("Adresse e-mail").fill(email);
-  await page.getByLabel("Mot de passe").fill(SEED_PASSWORD);
+  await page.getByLabel("Mot de passe").fill(motDePasse);
   await page.getByRole("button", { name: "Se connecter" }).click();
   await expect(page).toHaveURL(/\/verification-2fa/);
 
