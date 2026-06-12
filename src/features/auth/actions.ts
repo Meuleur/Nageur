@@ -22,6 +22,7 @@ import {
   resetRateLimit,
 } from "@/server/auth/rate-limit";
 import { establishVerifiedSession } from "@/server/auth/session";
+import { estModeDemo } from "@/server/demo";
 import { buildOtpEmail } from "@/server/email/otp-email";
 import { sendMail } from "@/server/email";
 import { issueOtpCode, verifyOtpCode } from "@/server/otp";
@@ -133,9 +134,16 @@ export async function signupAction(
       return { status: "error", message: GENERIC_ERROR };
     }
 
+    // DÉMO (branche demo) : compte confirmé d'office côté admin — le
+    // parcours d'onboarding se déroule sans e-mail de vérification. Si la
+    // confirmation échoue, le flux normal (lien reçu par e-mail) reste valable.
+    if (estModeDemo() && data.user) {
+      await service.auth.admin.updateUserById(data.user.id, { email_confirm: true });
+    }
+
     await logAuthEvent("auth.signup", {
       actorId: data.user?.id ?? null,
-      metadata: { role: "nageur" },
+      metadata: { role: "nageur", ...(estModeDemo() ? { demo: true } : {}) },
     });
   } catch {
     return { status: "error", message: GENERIC_ERROR };
@@ -215,22 +223,30 @@ export async function loginAction(
       // Le succès du premier facteur remet le compteur d'échecs à zéro.
       await resetRateLimit("login:echecs", email);
 
-      // Second facteur : un seul code actif. Si un envoi date de moins de
-      // 60 s (double soumission, reconnexion immédiate), on n'émet PAS de
-      // nouveau code — l'ancien reste valable (ADR-018, anti-spam).
-      const cooldown = await consumeRateLimit("otp:envoi", data.user.id, RATE_LIMITS.otpSendByUser);
-      const hourly = cooldown.allowed
-        ? await consumeRateLimit("otp:envoi-heure", data.user.id, RATE_LIMITS.otpSendHourlyByUser)
-        : cooldown;
-      if (cooldown.allowed && hourly.allowed) {
-        const code = await issueOtpCode(data.user.id);
-        try {
-          await sendMail(buildOtpEmail(email, code));
-        } catch {
-          return {
-            status: "error",
-            message: "Impossible d'envoyer le code de connexion. Réessayez dans un instant.",
-          };
+      // DÉMO (branche demo) : aucun code n'est émis ni envoyé — le second
+      // facteur se saute via le bouton dédié de E-02 (skipOtpDemoAction).
+      if (!estModeDemo()) {
+        // Second facteur : un seul code actif. Si un envoi date de moins de
+        // 60 s (double soumission, reconnexion immédiate), on n'émet PAS de
+        // nouveau code — l'ancien reste valable (ADR-018, anti-spam).
+        const cooldown = await consumeRateLimit(
+          "otp:envoi",
+          data.user.id,
+          RATE_LIMITS.otpSendByUser,
+        );
+        const hourly = cooldown.allowed
+          ? await consumeRateLimit("otp:envoi-heure", data.user.id, RATE_LIMITS.otpSendHourlyByUser)
+          : cooldown;
+        if (cooldown.allowed && hourly.allowed) {
+          const code = await issueOtpCode(data.user.id);
+          try {
+            await sendMail(buildOtpEmail(email, code));
+          } catch {
+            return {
+              status: "error",
+              message: "Impossible d'envoyer le code de connexion. Réessayez dans un instant.",
+            };
+          }
         }
       }
 

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 
+import { DemoBanner } from "@/components/demo-banner";
 import { AppProviders } from "@/components/providers";
 import "@/styles/globals.css";
 
@@ -23,6 +24,7 @@ export default function RootLayout({
   return (
     <html lang="fr" className={`${inter.variable} h-full antialiased`}>
       <body className="min-h-full flex flex-col">
+        <DemoBanner />
         <AppProviders>{children}</AppProviders>
       </body>
     </html>

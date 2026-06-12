@@ -4,6 +4,7 @@ import Link from "next/link";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { VerificationEmailPanel } from "@/features/auth/components/verification-email-panel";
+import { estModeDemo } from "@/server/demo";
 
 export const metadata: Metadata = { title: "Vérifiez votre e-mail — App Natation" };
 
@@ -37,6 +38,16 @@ export default async function VerificationEmailPage({
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
+        {/* DÉMO (branche demo) : le compte vient d'être confirmé d'office
+            côté serveur (signupAction) — aucun e-mail à attendre. */}
+        {estModeDemo() ? (
+          <Alert>
+            <AlertDescription>
+              Mode démo : votre compte est déjà vérifié — vous pouvez vous connecter immédiatement,
+              sans attendre d&apos;e-mail.
+            </AlertDescription>
+          </Alert>
+        ) : null}
         {notice ? (
           <Alert variant={notice.variant}>
             <AlertDescription>{notice.text}</AlertDescription>
