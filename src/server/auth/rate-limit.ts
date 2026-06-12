@@ -7,25 +7,8 @@ import { getAuthSecret } from "@/server/env";
 
 import { decideRateLimit, type RateLimitDecision, type RateLimitPolicy } from "./rate-limit-logic";
 
-/**
- * Politiques de limitation (C1) : seules les valeurs « renvoi OTP 60 s » et
- * « verrouillage ~10 échecs de connexion » sont imposées par l'ADR-018 ;
- * les autres sont des garde-fous applicatifs dimensionnés large.
- */
-export const RATE_LIMITS = {
-  /** Échecs de connexion par compte : ~10 → verrou temporaire (ADR-018). */
-  loginFailuresByEmail: { limit: 10, windowMs: 15 * 60_000, lockMs: 15 * 60_000 },
-  /** Garde-fou grossier par IP — la mesure fine est le verrou par compte. */
-  loginByIp: { limit: 100, windowMs: 15 * 60_000 },
-  signupByIp: { limit: 20, windowMs: 60 * 60_000 },
-  /** Renvoi d'un code OTP : au plus un envoi par minute (ADR-018). */
-  otpSendByUser: { limit: 1, windowMs: 60_000 },
-  otpSendHourlyByUser: { limit: 10, windowMs: 60 * 60_000 },
-  otpVerifyByIp: { limit: 60, windowMs: 15 * 60_000 },
-  resetByEmail: { limit: 3, windowMs: 60 * 60_000 },
-  resetByIp: { limit: 10, windowMs: 60 * 60_000 },
-  verificationResendByIp: { limit: 10, windowMs: 60 * 60_000 },
-} satisfies Record<string, RateLimitPolicy>;
+// Politiques (C1/ADR-027) déclarées dans le module pur, testable unitairement.
+export { RATE_LIMITS } from "./rate-limit-logic";
 
 /**
  * Clé de compteur : HMAC(scope:identifiant) — ni adresse e-mail ni IP en

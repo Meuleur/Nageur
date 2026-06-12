@@ -5,10 +5,12 @@ import { redirect } from "next/navigation";
 import { after } from "next/server";
 
 import { createSessionClient } from "@/lib/supabase/session";
-import { genererSeance, GenerationSeanceError } from "@/server/llm";
+import { consumeRateLimit, RATE_LIMITS } from "@/server/auth/rate-limit";
+import { genererSeance, GenerationSeanceError, journaliserGenerationLimitee } from "@/server/llm";
 import { notifierCoachSeanceEnAttente } from "@/server/notifications";
 
 import type { GenerationFormState } from "./form-state";
+import { messageGenerationLimitee } from "./garde-fou";
 
 /**
  * Action serveur E-12 (PN-5, RG-19) : déclenche la génération CH4
@@ -26,6 +28,28 @@ export async function genererSeanceAction(): Promise<GenerationFormState> {
   if (!user) {
     // Session absente ou expirée : retour à la connexion (RG-08).
     redirect("/connexion");
+  }
+
+  // ADR-027 : garde-fou de sécurité anti-emballement, sur l'infrastructure
+  // de rate limiting C1. Le seuil est large — l'usage normal ne l'atteint
+  // jamais (RG-24) ; un compteur indisponible refuse la génération (une
+  // mesure de sécurité ne se contourne pas silencieusement).
+  try {
+    const garde = await consumeRateLimit(
+      "generation:nageur",
+      user.id,
+      RATE_LIMITS.generationByUser,
+    );
+    if (!garde.allowed) {
+      await journaliserGenerationLimitee(user.id, garde.retryAfterSeconds);
+      return { status: "error", message: messageGenerationLimitee(garde.retryAfterSeconds) };
+    }
+  } catch {
+    return {
+      status: "error",
+      message: "La génération a échoué. Réessayez dans quelques instants.",
+      relancePossible: true,
+    };
   }
 
   let seanceId: string;
