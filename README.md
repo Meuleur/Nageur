@@ -157,7 +157,7 @@ Assurance continue de sécurité (audit v1 → CH10) :
 
 - **CodeQL** (`.github/workflows/codeql.yml`) — analyse statique de sécurité du
   TypeScript (requêtes `security-and-quality`) sur chaque PR, sur `main` et chaque
-  semaine ; résultats dans l'onglet *Security → Code scanning* du dépôt ;
+  semaine ; résultats dans l'onglet _Security → Code scanning_ du dépôt ;
 - **Dependabot** (`.github/dependabot.yml`) — veille hebdomadaire des dépendances npm
   (mineures/correctifs groupés) et des actions GitHub ;
 - `pnpm audit` est exécuté à chaque chantier ; le garde-fou anti-abus de la génération
