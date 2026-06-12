@@ -74,6 +74,16 @@ const GENERATION_USERS: Record<string, GenerationUser> = {
   "mobile-chrome": { email: "eva.nageur@nageur.test", coachEmail: "sacha.coach@nageur.test" },
 };
 
+/**
+ * CH10 — garde-fou anti-abus (ADR-027) : profil complet, coach Sacha, aucune
+ * séance seedée. Comptes dédiés : le test consomme toute la fenêtre de
+ * génération de la minute, aucun autre test ne doit la partager.
+ */
+const GARDE_FOU_USERS: Record<string, string> = {
+  chromium: "rayan.nageur@nageur.test",
+  "mobile-chrome": "elsa.nageur@nageur.test",
+};
+
 type RegenerationUser = { email: string; commentaireRefus: string };
 
 /** Refus → régénération (PN-8, RG-33) : une séance refusée seedée. */
@@ -322,6 +332,7 @@ export const lockoutUserFor = (testInfo: TestInfo) => forProject(LOCKOUT_USERS, 
 export const profilUserFor = (testInfo: TestInfo) => forProject(PROFIL_USERS, testInfo);
 export const sansCoachUserFor = (testInfo: TestInfo) => forProject(SANS_COACH_USERS, testInfo);
 export const generationUserFor = (testInfo: TestInfo) => forProject(GENERATION_USERS, testInfo);
+export const gardeFouUserFor = (testInfo: TestInfo) => forProject(GARDE_FOU_USERS, testInfo);
 export const regenerationUserFor = (testInfo: TestInfo) => forProject(REGENERATION_USERS, testInfo);
 export const listeUserFor = (testInfo: TestInfo) => forProject(LISTE_USERS, testInfo);
 export const detailUserFor = (testInfo: TestInfo) => forProject(DETAIL_USERS, testInfo);

@@ -1,0 +1,38 @@
+# Analyse statique de sécurité (audit v1 → CH10) : requêtes CodeQL
+# « security-and-quality » sur le TypeScript, à chaque PR, sur main et
+# chaque semaine (nouvelles requêtes appliquées au code existant).
+name: CodeQL
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  schedule:
+    - cron: "30 6 * * 1" # lundi 06:30 UTC
+
+jobs:
+  analyze:
+    name: Analyse (javascript-typescript)
+    runs-on: ubuntu-latest
+    permissions:
+      security-events: write
+      packages: read
+      actions: read
+      contents: read
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v4
+        with:
+          languages: javascript-typescript
+          build-mode: none
+          queries: security-and-quality
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v4
+        with:
+          category: "/language:javascript-typescript"

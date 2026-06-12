@@ -148,10 +148,20 @@ valeurs ; `.gitignore` exclut tous les `.env*`.
 
 GitHub Actions (`.github/workflows/ci.yml`) à chaque push et pull request :
 
-- **quality** — lint, typecheck, tests unitaires, build ;
+- **quality** — formatage (`prettier --check`), lint, typecheck, tests unitaires, build ;
 - **database** — démarrage d'une base Supabase propre, application des migrations + seed,
   rejeu des migrations (preuve d'idempotence) et tests pgTAP (isolation RLS, contraintes
   métier, cascades).
+
+Assurance continue de sécurité (audit v1 → CH10) :
+
+- **CodeQL** (`.github/workflows/codeql.yml`) — analyse statique de sécurité du
+  TypeScript (requêtes `security-and-quality`) sur chaque PR, sur `main` et chaque
+  semaine ; résultats dans l'onglet _Security → Code scanning_ du dépôt ;
+- **Dependabot** (`.github/dependabot.yml`) — veille hebdomadaire des dépendances npm
+  (mineures/correctifs groupés) et des actions GitHub ;
+- `pnpm audit` est exécuté à chaque chantier ; le garde-fou anti-abus de la génération
+  (ADR-027, `RATE_LIMITS.generationByUser`) borne le coût LLM sans contredire RG-24.
 
 ## Workflow Git (F3)
 

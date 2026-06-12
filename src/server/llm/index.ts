@@ -14,6 +14,7 @@ import { testerCleFournisseur, type ResultatTestCle } from "./test-cle";
 import type { FournisseurLlm, ResultatGeneration } from "./types";
 
 export { GenerationSeanceError } from "./errors";
+export { journaliserGenerationLimitee } from "./audit";
 export type { ResultatGeneration } from "./types";
 export type { ResultatTestCle } from "./test-cle";
 

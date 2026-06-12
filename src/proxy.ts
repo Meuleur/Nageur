@@ -27,7 +27,10 @@ function buildContentSecurityPolicy(nonce: string): string {
     // strict-dynamic : les scripts porteurs du nonce peuvent en charger
     // d'autres (chunks Next) ; unsafe-eval requis par React en dev seulement.
     `script-src 'self' 'nonce-${nonce}' 'strict-dynamic'${isDev ? " 'unsafe-eval'" : ""}`,
-    // unsafe-inline : attributs style posés par React/Framer Motion/Recharts.
+    // unsafe-inline : compromis CONNU et accepté (audit v1, note E2) —
+    // styles inline posés par React/Framer Motion/Recharts, aucun HTML non
+    // échappé dans l'app ; resserrable plus tard via hash/nonce de styles.
+    // Les scripts, eux, restent sous nonce strict.
     "style-src 'self' 'unsafe-inline'",
     "img-src 'self' blob: data:",
     "font-src 'self'",

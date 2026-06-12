@@ -4,6 +4,7 @@ import { seConnecter } from "./helpers/login";
 import { latestEmailId, waitForEmail } from "./helpers/mailpit";
 import {
   detailUserFor,
+  gardeFouUserFor,
   generationUserFor,
   listeUserFor,
   regenerationUserFor,
@@ -18,6 +19,7 @@ import {
  */
 
 const succes = (page: Page) => page.locator('[data-slot="alert"][role="status"]');
+const erreur = (page: Page) => page.locator('[data-slot="alert"][role="alert"]');
 const carteSeance = (page: Page) => page.getByRole("link").filter({ hasText: "Séance du" });
 
 test.describe("Parcours nageur — séances (E-12 à E-15)", () => {
@@ -55,6 +57,34 @@ test.describe("Parcours nageur — séances (E-12 à E-15)", () => {
     expect(emailCoach.text).toContain("Un de vos nageurs");
     expect(emailCoach.html).toMatch(/\/coach\/seances\/[0-9a-f-]+/);
     expect(emailCoach.text).not.toContain(user.email);
+  });
+
+  test("garde-fou anti-abus : la rafale est suspendue, l'usage normal jamais (ADR-027, RG-24)", async ({
+    page,
+  }, testInfo) => {
+    // 6 générations + connexion : marge large sur le timeout par défaut.
+    test.setTimeout(150_000);
+    const user = gardeFouUserFor(testInfo);
+    await seConnecter(page, user);
+
+    // En deçà du seuil (RATE_LIMITS.generationByUser : 5/min) : les
+    // générations s'enchaînent sans entrave ni délai (RG-24).
+    for (let i = 0; i < 5; i++) {
+      await page.goto("/seances/generer");
+      await page.getByRole("button", { name: "Générer ma séance" }).click();
+      await expect(page).toHaveURL(/generation=envoyee/, { timeout: 20_000 });
+    }
+
+    // Au-delà, dans la même minute : bloqué AVANT l'appel fournisseur, avec
+    // un message clair — pas de redirection, aucune séance créée.
+    await page.goto("/seances/generer");
+    await page.getByRole("button", { name: "Générer ma séance" }).click();
+    await expect(erreur(page)).toContainText("beaucoup de générations", { timeout: 20_000 });
+    await expect(erreur(page)).toContainText("Par mesure de sécurité, patientez");
+    await expect(page).toHaveURL(/\/seances\/generer/);
+
+    await page.goto("/seances");
+    await expect(carteSeance(page).filter({ hasText: "En attente" })).toHaveCount(5);
   });
 
   test("séance refusée : commentaire du coach puis régénération immédiate (PN-8, RG-33)", async ({
