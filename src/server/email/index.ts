@@ -52,6 +52,13 @@ async function sendWithMailpit(message: MailMessage): Promise<void> {
   }
 }
 
+/** DÉMO (branche demo) : aucun envoi, aucun appel réseau. La trace ne porte
+ * ni adresse ni contenu (PII, codes de sécurité) — uniquement le fait
+ * technique qu'un envoi a été ignoré. */
+async function sendWithDemo(): Promise<void> {
+  console.info("email: driver demo — envoi ignoré");
+}
+
 /**
  * Envoi d'un e-mail applicatif (code OTP 2FA — C1). Les e-mails propres à
  * Supabase Auth (vérification d'inscription, réinitialisation) partent par
@@ -59,7 +66,11 @@ async function sendWithMailpit(message: MailMessage): Promise<void> {
  * Ne jamais journaliser le contenu : il transporte des codes de sécurité.
  */
 export async function sendMail(message: MailMessage): Promise<void> {
-  if (getEmailDriver() === "mailpit") {
+  const driver = getEmailDriver();
+  if (driver === "demo") {
+    return sendWithDemo();
+  }
+  if (driver === "mailpit") {
     return sendWithMailpit(message);
   }
   return sendWithResend(message);

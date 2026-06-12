@@ -25,16 +25,19 @@ export function getAuthSecret(): string {
   return secret;
 }
 
-export type EmailDriver = "resend" | "mailpit";
+export type EmailDriver = "resend" | "mailpit" | "demo";
 
 /**
  * "resend" en production (ADR-013) ; "mailpit" route les e-mails applicatifs
- * vers la boîte locale de `supabase start` (dev / E2E), aucun envoi réel.
+ * vers la boîte locale de `supabase start` (dev / E2E), aucun envoi réel ;
+ * "demo" (branche demo) n'envoie RIEN — déploiement de démonstration client.
  */
 export function getEmailDriver(): EmailDriver {
   const driver = process.env.EMAIL_DRIVER ?? "resend";
-  if (driver !== "resend" && driver !== "mailpit") {
-    throw new Error(`Unsupported EMAIL_DRIVER "${driver}" (expected "resend" or "mailpit").`);
+  if (driver !== "resend" && driver !== "mailpit" && driver !== "demo") {
+    throw new Error(
+      `Unsupported EMAIL_DRIVER "${driver}" (expected "resend", "mailpit" or "demo").`,
+    );
   }
   return driver;
 }
