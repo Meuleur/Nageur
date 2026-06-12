@@ -21,6 +21,11 @@
     "llm:set-key": "node scripts/llm-set-key.mjs"
   },
   "packageManager": "pnpm@10.19.0",
+  "pnpm": {
+    "overrides": {
+      "next>postcss": "^8.5.10"
+    }
+  },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.104.1",
     "@hookform/resolvers": "^5.4.0",
