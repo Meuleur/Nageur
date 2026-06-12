@@ -9,6 +9,9 @@ import { defineConfig, devices } from "@playwright/test";
  */
 export default defineConfig({
   testDir: "tests/e2e",
+  // Suite du MODE DÉMO (branche demo) : serveur aux variables incompatibles
+  // (DEMO_MODE=true) → configuration dédiée, playwright.demo.config.ts.
+  testIgnore: "**/mode-demo/**",
   globalSetup: "./tests/e2e/global-setup.ts",
   fullyParallel: true,
   forbidOnly: !!process.env.CI,

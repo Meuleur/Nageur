@@ -23,6 +23,11 @@ test.describe("Connexion + 2FA", () => {
     await page.getByRole("button", { name: "Se connecter" }).click();
     await expect(page).toHaveURL(/\/verification-2fa/);
 
+    // DÉMO inerte hors DEMO_MODE (branche demo) : ni bouton de saut du
+    // second facteur, ni bannière DÉMO — comportement identique à la prod.
+    await expect(page.getByRole("button", { name: "Passer (démo)" })).toHaveCount(0);
+    await expect(page.locator('[data-slot="demo-banner"]')).toHaveCount(0);
+
     // GATING C1 : aucun cookie de session Supabase (sb-*) avant l'OTP —
     // seul le jeton de transition httpOnly existe.
     const cookiesBefore = await context.cookies();
