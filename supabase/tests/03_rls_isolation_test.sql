@@ -172,10 +172,10 @@ select results_eq('select count(*)::int from public.auto_evaluations', array[0],
 -- ---------------------------------------------------------------------------
 select pg_temp.connecter('10000000-0000-4000-8000-000000000001');
 
--- 54 profils seedés : 1 admin + 8 admins CH8 + 2 admins CH9, 3 coachs +
+-- 56 profils seedés : 1 admin + 8 admins CH8 + 2 admins CH9, 3 coachs +
 -- 8 coachs CH6 + 2 coachs CH8 + 2 coachs CH9, 8 nageurs CH1/CH3, 8 nageurs
--- CH5, 8 nageurs CH6 et 4 nageurs CH8.
-select results_eq('select count(*)::int from public.profiles', array[54],
+-- CH5, 8 nageurs CH6, 4 nageurs CH8 et 2 nageurs CH10.
+select results_eq('select count(*)::int from public.profiles', array[56],
   'admin : lit toutes les identités, rôles et affectations');
 select results_eq('select count(*)::int from public.swimmer_profiles', array[0],
   'admin : pas d''accès aux profils sportifs');

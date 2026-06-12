@@ -12,8 +12,13 @@ import { execSync } from "node:child_process";
 const PROFIL_E2E_EMAILS =
   "('mia.nageur@nageur.test','zoe.nageur@nageur.test','tom.nageur@nageur.test','theo.nageur@nageur.test')";
 
-/** Comptes CH5 « génération » : aucune séance seedée — tout est généré par les tests. */
-const GENERATION_E2E_EMAILS = "('ines.nageur@nageur.test','eva.nageur@nageur.test')";
+/**
+ * Comptes CH5 « génération » et CH10 « garde-fou » (ADR-027) : aucune séance
+ * seedée — tout est généré par les tests (le truncate d'auth_rate_limits
+ * ci-dessous remet aussi la fenêtre du garde-fou à zéro).
+ */
+const GENERATION_E2E_EMAILS =
+  "('ines.nageur@nageur.test','eva.nageur@nageur.test','rayan.nageur@nageur.test','elsa.nageur@nageur.test')";
 
 /** Comptes CH5 « refus → régénération » : on ne garde que la séance refusée seedée. */
 const REGENERATION_E2E_EMAILS = "('mael.nageur@nageur.test','yanis.nageur@nageur.test')";

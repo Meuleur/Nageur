@@ -286,6 +286,31 @@ insert into public.series (id, seance_id, ordre, repetitions, distance_m, type_n
 on conflict (id) do nothing;
 
 -- ---------------------------------------------------------------------------
+-- CH10 — Comptes E2E du garde-fou de génération (ADR-027).
+-- Rayan / Elsa : profil complet, coach Sacha, aucune séance seedée — le test
+-- enchaîne les générations jusqu'au seuil ; global-setup purge les séances
+-- créées et truncate auth_rate_limits (fenêtres remises à zéro).
+-- ---------------------------------------------------------------------------
+insert into auth.users
+  (instance_id, id, aud, role, email, encrypted_password, email_confirmed_at,
+   raw_app_meta_data, raw_user_meta_data, created_at, updated_at,
+   confirmation_token, recovery_token, email_change_token_new, email_change)
+values
+  ('00000000-0000-0000-0000-000000000000', '30000000-0000-4000-8000-000000000029', 'authenticated', 'authenticated', 'rayan.nageur@nageur.test', extensions.crypt('Password123!', extensions.gen_salt('bf')), now(), '{"provider":"email","providers":["email"]}', '{}', now(), now(), '', '', '', ''),
+  ('00000000-0000-0000-0000-000000000000', '30000000-0000-4000-8000-000000000030', 'authenticated', 'authenticated', 'elsa.nageur@nageur.test',  extensions.crypt('Password123!', extensions.gen_salt('bf')), now(), '{"provider":"email","providers":["email"]}', '{}', now(), now(), '', '', '', '')
+on conflict (id) do nothing;
+
+insert into public.profiles (id, role, prenom, nom, email, coach_id) values
+  ('30000000-0000-4000-8000-000000000029', 'nageur', 'Rayan', 'Bellec', 'rayan.nageur@nageur.test', '20000000-0000-4000-8000-000000000003'),
+  ('30000000-0000-4000-8000-000000000030', 'nageur', 'Elsa',  'Morel',  'elsa.nageur@nageur.test',  '20000000-0000-4000-8000-000000000003')
+on conflict (id) do nothing;
+
+insert into public.swimmer_profiles (nageur_id, niveau, frequence, duree, bassin, objectifs, materiel) values
+  ('30000000-0000-4000-8000-000000000029', 'intermediaire', 3, 45, 25, array['endurance']::public.objectif[], array[]::public.materiel[]),
+  ('30000000-0000-4000-8000-000000000030', 'debutant',      2, 45, 25, array['loisir']::public.objectif[],    array[]::public.materiel[])
+on conflict (nageur_id) do nothing;
+
+-- ---------------------------------------------------------------------------
 -- CH6 — Comptes et séances E2E (parcours coach, E-20 à E-24).
 -- Un COACH par test ET par projet Playwright (OTP à usage unique + anti-spam
 -- 60 s) ; chaque coach suit son propre nageur pour ne toucher ni aux comptes
