@@ -1,0 +1,19 @@
+# Surveillance continue des dépendances (audit v1 → CH10).
+# Les mises à jour mineures/correctifs npm sont groupées pour limiter le
+# bruit de PR ; les majeures restent individuelles (revue dédiée).
+version: 2
+updates:
+  - package-ecosystem: "npm" # couvre pnpm (pnpm-lock.yaml)
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    groups:
+      mineures-et-correctifs:
+        update-types:
+          - "minor"
+          - "patch"
+
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
